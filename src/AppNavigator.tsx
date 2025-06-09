@@ -97,6 +97,9 @@ import {
 import { mmkvStore } from 'utils/storage';
 import { EarningPreview } from 'screens/EarningPreview';
 import { EarningPreviewPools } from 'screens/EarningPreview/EarningPreviewPools';
+import { CreateWalletScreen } from 'screens/CreateWalletScreen';
+import AddExistingWallet from 'screens/AddExistingWallet';
+import ImportWalletScreen from 'screens/ImportWallet';
 
 interface Props {
   isAppReady: boolean;
@@ -611,6 +614,9 @@ const AppNavigator = ({ isAppReady }: Props) => {
             <>
               <Stack.Group screenOptions={{ headerShown: false, animation: 'fade_from_bottom' }}>
                 <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+                <Stack.Screen name="CreateWallet" component={CreateWalletScreen} />
+                <Stack.Screen name="AddExistingWallet" component={AddExistingWallet} options={{ headerShown: false }} />
+                <Stack.Screen name="ImportWallet" component={ImportWalletScreen} />
                 <Stack.Screen name="SendFund" component={SendFund} options={{ gestureEnabled: false }} />
                 <Stack.Screen name="SendNFT" component={SendNFT} options={{ gestureEnabled: false }} />
                 <Stack.Screen name="BrowserSearch" component={BrowserSearch} />

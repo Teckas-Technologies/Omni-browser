@@ -1,289 +1,129 @@
-import { Images } from 'assets/index';
-import { FileArrowDown, PlusCircle, Swatches } from 'phosphor-react-native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ImageBackground, Platform, SafeAreaView, StatusBar, StyleProp, View, Linking } from 'react-native';
-import { ColorMap } from 'styles/color';
-import { FontMedium, FontSemiBold, sharedStyles, STATUS_BAR_LIGHT_CONTENT } from 'styles/sharedStyles';
-import i18n from 'utils/i18n/i18n';
-import Text from 'components/Text';
-import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
-import AccountActionButton from 'components/common/Account/AccountActionButton';
-import { AccountCreationArea } from 'components/common/Account/AccountCreationArea';
-import { SelectedActionType } from 'stores/types';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { RootNavigationProps } from 'routes/index';
-import { useSelector } from 'react-redux';
-import { RootState } from 'stores/index';
-import { ModalRef } from 'types/modalRef';
-import { GeneralTermModal } from 'components/Modal/GeneralTermModal';
-import { mmkvStore } from 'utils/storage';
-import { Image } from 'components/design-system-ui';
-import { SelectLanguageModal } from 'components/Modal/SelectLanguageModal';
-import { YieldPoolInfo, YieldPoolType } from '@subwallet/extension-base/types';
-import { getPoolSlug } from 'utils/earn';
-import { isHandleDeeplinkPromise, setIsHandleDeeplinkPromise } from '../../App';
-
-const imageBackgroundStyle: StyleProp<any> = {
-  flex: 1,
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  paddingHorizontal: 16,
-  paddingBottom: Platform.OS === 'ios' ? 56 : 20,
-  position: 'relative',
-};
-
-const logoStyle: StyleProp<any> = {
-  width: '100%',
-  flex: 1,
-  justifyContent: 'flex-end',
-  position: 'relative',
-  alignItems: 'center',
-  paddingBottom: 22,
-};
-
-const logoTextStyle: StyleProp<any> = {
-  fontSize: 38,
-  lineHeight: 46,
-  ...FontSemiBold,
-  color: ColorMap.light,
-  paddingTop: 9,
-};
-
-const logoSubTextStyle: StyleProp<any> = {
-  fontSize: 16,
-  lineHeight: 24,
-  ...FontMedium,
-  color: 'rgba(255, 255, 255, 0.65)',
-  paddingTop: 12,
-};
-
-const firstScreenNotificationStyle: StyleProp<any> = {
-  ...sharedStyles.smallText,
-  color: 'rgba(255, 255, 255, 0.45)',
-  textAlign: 'center',
-  paddingHorizontal: 16,
-  paddingTop: 0,
-  ...FontMedium,
-};
-
-type EarningDataInfo = { chain: string; type: YieldPoolType; target: string; isNoAccount: boolean };
-
-export const firstScreenDeepLink: { current: string | undefined } = { current: undefined };
-
-export function setFirstScreenDeepLink(value?: string) {
-  firstScreenDeepLink.current = value;
-}
+import React from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from 'routes/index';
+import { Alert } from 'react-native';
 
 export const FirstScreen = () => {
-  const navigation = useNavigation<RootNavigationProps>();
-  const { hasMasterPassword } = useSelector((state: RootState) => state.accountState);
-  const createAccountRef = useRef<ModalRef>();
-  const importAccountRef = useRef<ModalRef>();
-  const attachAccountRef = useRef<ModalRef>();
-  const theme = useSubWalletTheme().swThemes;
-  const [generalTermVisible, setGeneralTermVisible] = useState<boolean>(false);
-  const [showLanguageModal, setShowLanguageModal] = useState<boolean>(false);
-  const [selectedActionType, setSelectedActionType] = useState<SelectedActionType>('createAcc');
-  const isOpenGeneralTermFirstTime = mmkvStore.getBoolean('isOpenGeneralTermFirstTime');
-  const [previewModalVisible, setPreviewModalVisible] = useState<boolean>(false);
-  const isFocused = useIsFocused();
-  const onlinePoolInfoMap = useMemo(() => {
-    try {
-      return JSON.parse(mmkvStore.getString('poolInfoMap') || '') as Record<string, YieldPoolInfo>;
-    } catch (e) {
-      return {};
-    }
-  }, []);
-  const previewModalVisibleRef = useRef<boolean>(previewModalVisible);
-  previewModalVisibleRef.current = previewModalVisible;
+  type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-  const getSelectedSlug = useCallback(
-    (data: string) => {
-      const dataMap: EarningDataInfo = data.split('&').reduce((obj, cur) => {
-        const splitCur = cur.split('=');
-        // @ts-ignore
-        obj[splitCur[0]] = splitCur[1];
-        return obj;
-      }, {} as EarningDataInfo);
-
-      return getPoolSlug(onlinePoolInfoMap, dataMap.chain, dataMap.type);
-    },
-    [onlinePoolInfoMap],
-  );
-
-  useEffect(() => {
-    if (isFocused) {
-      setIsHandleDeeplinkPromise(true);
-    }
-  }, [isFocused]);
-
-  useEffect(() => {
-    const unsubscribe = Linking.addEventListener('url', ({ url }) => {
-      let _url = url;
-      if (_url.includes('/transaction-action/earning')) {
-        if (!_url.includes('isNoAccount=true')) {
-          _url = `${url}&isNoAccount=true`;
-          setFirstScreenDeepLink(_url);
-          Linking.openURL(_url);
-
-          return;
-        }
-        !previewModalVisibleRef.current && setPreviewModalVisible(true);
-      }
-    });
-
-    return () => unsubscribe.remove();
-  }, [getSelectedSlug]);
-
-  useEffect(() => {
-    if (isHandleDeeplinkPromise.current && isFocused) {
-      Linking.getInitialURL().then(url => {
-        url &&
-          Linking.canOpenURL(url)
-            .then(supported => {
-              if (supported) {
-                Linking.openURL(url);
-              }
-            })
-            .catch(e => {
-              console.warn(`Error opening URL: ${e}`);
-            });
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const onPressActionButton = useCallback((action: SelectedActionType) => {
-    return () => {
-      setSelectedActionType(action);
-      switch (action) {
-        case 'createAcc':
-          createAccountRef && createAccountRef.current?.onOpenModal();
-          break;
-        case 'attachAcc':
-          attachAccountRef && attachAccountRef.current?.onOpenModal();
-          break;
-        case 'importAcc':
-          importAccountRef && importAccountRef.current?.onOpenModal();
-          break;
-      }
-    };
-  }, []);
-
-  const onPressTermsCondition = () => {
-    Linking.openURL('https://docs.subwallet.app/main/privacy-and-security/terms-of-service');
-  };
-
-  const onPressPolicy = () => {
-    Linking.openURL('https://docs.subwallet.app/main/privacy-and-security/terms-of-use#privacy-policy');
-  };
-
-  const onShowGeneralTermModal = (action: SelectedActionType) => {
-    return () => {
-      setSelectedActionType(action);
-      setGeneralTermVisible(true);
-    };
-  };
-
-  const onCreate = useCallback(() => {
-    if (hasMasterPassword) {
-      navigation.navigate('CreateAccount', {});
-    } else {
-      navigation.navigate('CreatePassword', { pathName: 'CreateAccount' });
-    }
-  }, [hasMasterPassword, navigation]);
-
-  const actionList = [
-    {
-      key: 'create',
-      icon: PlusCircle,
-      title: i18n.welcomeScreen.createAccLabel,
-      subTitle: i18n.welcomeScreen.createAccMessage,
-      onPress: !isOpenGeneralTermFirstTime ? onShowGeneralTermModal('createAcc') : onCreate,
-    },
-    {
-      key: 'import',
-      icon: FileArrowDown,
-      title: i18n.welcomeScreen.importAccLabel,
-      subTitle: i18n.welcomeScreen.importAccMessage,
-      onPress: !isOpenGeneralTermFirstTime ? onShowGeneralTermModal('importAcc') : onPressActionButton('importAcc'),
-    },
-    {
-      key: 'attach',
-      icon: Swatches,
-      title: i18n.welcomeScreen.attachAccLabel,
-      subTitle: i18n.welcomeScreen.attachAccMessage,
-      onPress: !isOpenGeneralTermFirstTime ? onShowGeneralTermModal('attachAcc') : onPressActionButton('attachAcc'),
-    },
-  ];
-
-  const onPressAcceptBtn = () => {
-    mmkvStore.set('isOpenGeneralTermFirstTime', true);
-    setGeneralTermVisible(false);
-    switch (selectedActionType) {
-      case 'createAcc':
-        onCreate();
-        break;
-      case 'importAcc':
-        onPressActionButton('importAcc')();
-        break;
-      case 'attachAcc':
-        onPressActionButton('attachAcc')();
-        break;
-    }
-  };
-
+  const navigation = useNavigation<NavigationProp>();
   return (
-    <View style={{ width: '100%', flex: 1 }}>
-      <StatusBar barStyle={STATUS_BAR_LIGHT_CONTENT} translucent={true} backgroundColor={'transparent'} />
-      <ImageBackground source={Images.backgroundImg} resizeMode={'cover'} style={imageBackgroundStyle}>
-        <SafeAreaView />
-        <View style={logoStyle}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              marginBottom: 16,
-              paddingTop: 40,
-              alignItems: 'center',
-            }}>
-            <Image src={Images.SubWalletLogoGradient} style={{ width: 66, height: 100 }} />
-            <Text style={logoTextStyle}>SubWallet</Text>
-            <Text style={logoSubTextStyle}>{i18n.title.slogan}</Text>
-            <SelectLanguageModal setShowLanguageModal={setShowLanguageModal} showLanguageModal={showLanguageModal} />
-          </View>
+    <View style={styles.container}>
+      {/* Omni Logo Top */}
+      <Image source={require('assets/images/omni_logo.png')} style={styles.topLogo} resizeMode="contain" />
 
-          <View style={{ width: '100%' }}>
-            {actionList.map(item => (
-              <AccountActionButton key={item.key} item={item} />
-            ))}
-          </View>
-        </View>
+      {/* Center Symbol */}
+      <ImageBackground
+        source={require('assets/images/omni_symbol_bg.png')}
+        style={styles.centerSymbolBg}
+        resizeMode="contain">
+        <Image source={require('assets/images/omni_symbol.png')} style={styles.centerSymbol} resizeMode="contain" />
+      </ImageBackground>
 
-        <Text style={firstScreenNotificationStyle}>{i18n.common.firstScreenMessagePart1}</Text>
-        <Text style={firstScreenNotificationStyle}>
-          <Text onPress={onPressTermsCondition} style={{ color: theme.colorTextLight1 }}>
-            {i18n.common.termAndConditions}
-          </Text>
-          <Text>{i18n.common.and}</Text>
-          <Text onPress={onPressPolicy} style={{ color: theme.colorTextLight1 }}>
-            {i18n.common.privacyPolicy}
-          </Text>
+      {/* Centered Welcome Text + Button Block */}
+      <View style={styles.centeredTextWrapper}>
+        <Text style={styles.welcomeText}>Welcome to</Text>
+        <Text style={styles.titleText}>
+          <Text style={styles.titleBlue}>Omni</Text> Wallet
         </Text>
 
-        <AccountCreationArea
-          createAccountRef={createAccountRef}
-          importAccountRef={importAccountRef}
-          attachAccountRef={attachAccountRef}
-          allowToShowSelectType={true}
-        />
-        <GeneralTermModal
-          modalVisible={generalTermVisible}
-          setVisible={setGeneralTermVisible}
-          onPressAcceptBtn={onPressAcceptBtn}
-        />
-        <SafeAreaView />
-      </ImageBackground>
+        <View style={styles.buttonAlignRight}>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={() => {
+              navigation.navigate('CreateWallet');
+            }}>
+            <Text style={styles.primaryButtonText}>
+              Create <Text style={styles.primaryButtonTextBlue}>New Wallet</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Already have a wallet link */}
+      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('AddExistingWallet')}>
+        <Text style={styles.secondaryText}>Already have a wallet</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#040404',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 80,
+    paddingHorizontal: 24,
+  },
+  topLogo: {
+    width: 160,
+    height: 100,
+    marginBottom: 40,
+    alignSelf: 'flex-start',
+  },
+  centerSymbolBg: {
+    width: 240,
+    height: 240,
+    marginBottom: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centerSymbol: {
+    width: 140,
+    height: 140,
+  },
+  centeredTextWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  welcomeText: {
+    color: '#FFFFFF',
+    fontSize: 30,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  titleText: {
+    color: '#FFFFFF',
+    fontSize: 30,
+    fontWeight: '700',
+    marginBottom: 20,
+  },
+  titleBlue: {
+    fontSize: 45,
+    fontWeight: '900',
+    color: '#70befa',
+  },
+  buttonAlignRight: {
+    width: '85%', // approx width matching title text line
+    alignItems: 'flex-end',
+  },
+  primaryButton: {
+    backgroundColor: '#1C1C1E',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  primaryButtonTextBlue: {
+    color: '#70befa',
+  },
+  secondaryButton: {
+    paddingVertical: 8,
+  },
+  secondaryText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+});

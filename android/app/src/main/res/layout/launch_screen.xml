@@ -5,75 +5,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0C0C0C">
-
-  <LinearLayout
-      android:layout_width="wrap_content"
-      android:layout_height="407dp"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentTop="true"
-      android:layout_alignParentEnd="true"
-      android:layout_alignParentBottom="true"
-      android:layout_marginStart="27dp"
-      android:layout_marginTop="161dp"
-      android:layout_marginEnd="27dp"
-      android:layout_marginBottom="163dp"
-      android:gravity="center"
-      android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="80dp"
-        android:layout_height="120dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/logo" />
-
-    <ImageView
-        android:id="@+id/imageView2"
+    <!-- Main Content Container -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scaleType="center"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/sublogo" />
-  </LinearLayout>
-
-  <ImageView
-      android:id="@+id/imageView"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentEnd="true"
-      android:layout_marginStart="0dp"
-      android:layout_marginEnd="0dp"
-      android:scaleType="fitXY"
-      android:src="@drawable/splash_background" />
-
-  <TextView
-      android:id="@+id/second"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_above="@+id/third"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentEnd="true"
-      android:layout_marginStart="0dp"
-      android:layout_marginEnd="0dp"
-      android:layout_marginBottom="3dp"
-      android:gravity="center_horizontal"
-      android:text="By continuing, you agree to our"
-      android:textAlignment="center"
-      android:textColor="#73FFFFFF" />
-
-  <TextView
-      android:id="@+id/third"
-      android:layout_width="412dp"
-      android:layout_height="wrap_content"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentEnd="true"
-      android:layout_alignParentBottom="true"
-      android:layout_marginStart="-1dp"
-      android:layout_marginEnd="0dp"
-      android:layout_marginBottom="25dp"
-      android:gravity="center_horizontal"
-      android:text="Terms &amp; Conditions and Privacy Policy"
-      android:textAlignment="center"
-      android:textColor="#D9FFFFFF" />
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+        <!-- Logo with Blue Circle Background -->
+        <RelativeLayout
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/blue_circle"> <!-- Blue background for image -->
+            <!-- Logo Image -->
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/logo"
+                android:scaleType="fitCenter"/>
+        </RelativeLayout>
+        <!-- Welcome Text -->
+        <!-- <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:layout_marginBottom="8dp"/> -->
+        <!-- App Name with custom styling for "Omni" -->
+        <!-- <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Omni"
+                android:textColor="#4285F4"
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" wallet"
+                android:textColor="#FFFFFF"
+                android:textSize="32sp"
+                android:textStyle="bold"/>
+        </LinearLayout> -->
+    </LinearLayout>
+    <!-- Footer Text -->
+    <!-- <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="Secure. Simple. Powerful."
+        android:textColor="#73FFFFFF"
+        android:textSize="14sp"/> -->
 </RelativeLayout>

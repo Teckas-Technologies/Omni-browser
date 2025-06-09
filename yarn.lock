@@ -16505,6 +16505,11 @@ react-native-fit-image@^1.5.5:
   dependencies:
     prop-types "^15.5.10"
 
+react-native-flipper@^0.273.0:
+  version "0.273.0"
+  resolved "https://registry.yarnpkg.com/react-native-flipper/-/react-native-flipper-0.273.0.tgz#20c6922d135705da65e00631ade6c1bb9ab7fc3c"
+  integrity sha512-Eq0GW5ng8MrrW8JQDPIuqf9NVZRMhOF6xOCA7+xsy1sYxDZ1q81x5Mt4jNkk4vAdqILT5u8l/0ONilEIbiWlBQ==
+
 react-native-fs@^2.20.0:
   version "2.20.0"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.20.0.tgz#05a9362b473bfc0910772c0acbb73a78dbc810f6"
@@ -16744,10 +16749,10 @@ react-native-user-inactivity@^1.2.0:
   dependencies:
     usetimeout-react-hook "^0.1.2"
 
-react-native-vector-icons@^10.0.0:
-  version "10.0.3"
-  resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-10.0.3.tgz#369824a3b17994b2cd65edbaa32dbf9540d49678"
-  integrity sha512-ZgVlV5AdQgnPHHvBEihGf2xwyziT1acpXV1U+WfCgCv3lcEeCRsmwAsBU+kUSNsU+8TcWVsX04kdI6qUaS8D7w==
+react-native-vector-icons@^10.2.0:
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-10.2.0.tgz#f438f2ca16f7d6be658fd6ec8f0d2b7e2132b91c"
+  integrity sha512-n5HGcxUuVaTf9QJPs/W22xQpC2Z9u0nb0KgLPnVltP8vdUvOp6+R26gF55kilP/fV4eL4vsAHUqUjewppJMBOQ==
   dependencies:
     prop-types "^15.7.2"
     yargs "^16.1.1"

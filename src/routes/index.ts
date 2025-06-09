@@ -92,6 +92,10 @@ export type RootStackParamList = {
   };
   ManageAddressBook: undefined;
   DeriveAccount: undefined;
+  FirstScreen: undefined;
+  CreateWallet: undefined;
+   AddExistingWallet: undefined;
+   ImportWallet: undefined;
 };
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>;
