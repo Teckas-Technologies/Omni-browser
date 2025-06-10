@@ -18,7 +18,7 @@ export const FirstScreen = () => {
   if (username) {
     navigation.navigate('CreateAccount', {});
   } else {
-    navigation.navigate('CreateUserName');
+    navigation.navigate('CreatePassword', { pathName: 'CreateAccount' });
   }
 }, [username, navigation]);
   return (

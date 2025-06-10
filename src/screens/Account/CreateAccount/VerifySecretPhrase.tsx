@@ -1,18 +1,23 @@
-import useUnlockModal from 'hooks/modal/useUnlockModal';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleProp, View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import Text from 'components/Text';
 import { SeedWord } from 'components/SeedWord';
-import { ColorMap } from 'styles/color';
-import { ContainerHorizontalPadding, FontMedium, MarginBottomForSubmitButton, sharedStyles } from 'styles/sharedStyles';
-import { getWordKey, SeedPhraseArea, SelectedWordType } from 'components/SeedPhraseArea';
-import { shuffleArray } from 'utils/index';
-import i18n from 'utils/i18n/i18n';
 import { Button, Icon } from 'components/design-system-ui';
 import { CheckCircle } from 'phosphor-react-native';
+import {
+  sharedStyles,
+  FontMedium,
+  ContainerHorizontalPadding,
+  MarginBottomForSubmitButton,
+} from 'styles/sharedStyles';
+import { ColorMap } from 'styles/color';
+import { shuffleArray } from 'utils/index';
 import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
+import { getWordKey } from 'components/SeedPhraseArea';
+import i18n from 'utils/i18n/i18n';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'routes/index';
+import useUnlockModal from 'hooks/modal/useUnlockModal';
 
 interface Props {
   onPressSubmit: () => void;
@@ -21,118 +26,103 @@ interface Props {
   navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
-const bodyAreaStyle: StyleProp<any> = {
-  flex: 1,
-};
-
-const footerAreaStyle: StyleProp<any> = {
-  ...MarginBottomForSubmitButton,
-  paddingTop: 16,
-};
-
-const infoBlockStyle: StyleProp<any> = {
-  ...ContainerHorizontalPadding,
-  marginBottom: 24,
-};
-
-const infoTextStyle: StyleProp<any> = {
-  ...sharedStyles.mainText,
-  ...FontMedium,
-  color: ColorMap.disabled,
-  textAlign: 'center',
-};
-
-const phraseAreaStyle: StyleProp<any> = {
-  marginBottom: 24,
-};
-
-const phraseBlockStyle: StyleProp<any> = {
-  paddingLeft: 14,
-  paddingRight: 14,
-  flexDirection: 'row',
-  justifyContent: 'center',
-  flexWrap: 'wrap',
-  marginBottom: 24,
-};
-
-const seedWordStyle = {
-  margin: 2,
-};
-
-const isCorrectWord = (selectedWords: SelectedWordType[], seed: string) => {
-  return selectedWords.map(item => item.word).join(' ') === seed;
-};
+// Adjust this array to control which indexes (0-based) are blank/missing
+const missingIndexes = [0, 7, 10]; // i.e., positions 1, 8, and 11
 
 export const VerifySecretPhrase = ({ onPressSubmit, seed, isBusy, navigation }: Props) => {
-  const [selectedWords, setSelectedWords] = useState<SelectedWordType[]>([]);
-  const [shuffleWords, setShuffleWords] = useState<string[] | null>(null);
-  const seedWords: string[] = seed.split(' ');
+  const seedWords = seed.trim().split(' ');
+  const [filledWords, setFilledWords] = useState<(string | null)[]>([]);
+  const [wordOptions, setWordOptions] = useState<string[]>([]);
+  const [usedWordKeys, setUsedWordKeys] = useState<string[]>([]);
   const theme = useSubWalletTheme().swThemes;
-
-  useEffect((): void => {
-    const words = seed.split(' ');
-    shuffleArray(words);
-    setShuffleWords(words);
-  }, [seed]);
-
-  const onSelectWord = (word: string, wordKey: string) => {
-    return () => {
-      const newSelectedWord: SelectedWordType[] = [...selectedWords];
-      newSelectedWord.push({ word, wordKey });
-      setSelectedWords(newSelectedWord);
-    };
-  };
-
-  const onUnSelectWord = (word: string, wordKey: string) => {
-    const newSelectedWord: SelectedWordType[] = selectedWords.filter(
-      item => !(item.word === word && item.wordKey === wordKey),
-    );
-
-    setSelectedWords(newSelectedWord);
-  };
-
-  const renderSeedWord = (word: string, index: number) => {
-    const wordKey = getWordKey(word, index);
-
-    return (
-      <SeedWord
-        style={seedWordStyle}
-        key={wordKey}
-        title={word}
-        onPress={onSelectWord(word, wordKey)}
-        isActivated={selectedWords.some(item => item.word === word && item.wordKey === wordKey)}
-      />
-    );
-  };
-
   const { onPress: onSubmit } = useUnlockModal(navigation);
 
-  const getCreateAccBtn = (color: string) => {
-    return <Icon phosphorIcon={CheckCircle} size={'lg'} iconColor={color} weight={'fill'} />;
+  useEffect(() => {
+    const initial = seedWords.map((word, idx) => (missingIndexes.includes(idx) ? null : word));
+    setFilledWords(initial);
+
+    const missingWords = missingIndexes.map(index => seedWords[index]);
+    const shuffled = shuffleArray([...missingWords]);
+    setWordOptions(shuffled);
+  }, [seed]);
+
+  const onSelectWord = (word: string) => {
+    const indexToFill = filledWords.findIndex(
+      (w, i) => missingIndexes.includes(i) && w === null
+    );
+    if (indexToFill === -1) return;
+
+    const updated = [...filledWords];
+    updated[indexToFill] = word;
+    setFilledWords(updated);
+    setUsedWordKeys(prev => [...prev, getWordKey(word, indexToFill)]);
   };
+
+  const isAllCorrect = filledWords.every((word, i) => word === seedWords[i]);
+
+  const renderSeedSlots = () => {
+    return seedWords.map((_, index) => {
+      const word = filledWords[index];
+      const isMissing = missingIndexes.includes(index);
+      const title = word ? `${index + 1}. ${word}` : `${index + 1}. `;
+
+      return (
+        <SeedWord
+          key={`slot-${index}`}
+          style={{ margin: 4, minWidth: 120 }}
+          title={title}
+          disabled={!isMissing}
+          onPress={() => {}}
+        />
+      );
+    });
+  };
+
+  const renderWordOptions = () => {
+    return wordOptions.map((word, i) => {
+      const wordKey = getWordKey(word, i);
+      const isUsed = usedWordKeys.includes(wordKey);
+      return (
+        <SeedWord
+          key={wordKey}
+          style={{ margin: 4 }}
+          title={word}
+          disabled={isUsed}
+          onPress={() => onSelectWord(word)}
+        />
+      );
+    });
+  };
+
+  const getIcon = (color: string) => (
+    <Icon phosphorIcon={CheckCircle} size="lg" iconColor={color} weight="fill" />
+  );
 
   return (
     <View style={sharedStyles.layoutContainer}>
-      <ScrollView contentContainerStyle={bodyAreaStyle}>
-        <View style={infoBlockStyle}>
-          <Text style={infoTextStyle}>{i18n.warningMessage.initSecretPhrase}</Text>
+      <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <View style={{ ...ContainerHorizontalPadding, marginBottom: 24 }}>
+          <Text style={{ ...sharedStyles.mainText, ...FontMedium, color: ColorMap.disabled, textAlign: 'center' }}>
+            {i18n.warningMessage.initSecretPhrase}
+          </Text>
         </View>
-        <SeedPhraseArea
-          currentWords={selectedWords}
-          onTapWord={onUnSelectWord}
-          originWords={seedWords}
-          style={phraseAreaStyle}
-        />
-        <View style={phraseBlockStyle}>{shuffleWords && shuffleWords.map(renderSeedWord)}</View>
+
+        <View style={{ paddingHorizontal: 14, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 24 }}>
+          {renderSeedSlots()}
+        </View>
+
+        <View style={{ paddingHorizontal: 14, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {renderWordOptions()}
+        </View>
       </ScrollView>
-      <View style={footerAreaStyle}>
+
+      <View style={{ ...MarginBottomForSubmitButton, paddingTop: 16 }}>
         <Button
-          icon={getCreateAccBtn(
-            !isCorrectWord(selectedWords, seed) || isBusy ? theme.colorTextLight5 : theme.colorWhite,
-          )}
-          disabled={!isCorrectWord(selectedWords, seed) || isBusy}
+          icon={getIcon(!isAllCorrect || isBusy ? theme.colorTextLight5 : theme.colorWhite)}
+          disabled={!isAllCorrect || isBusy}
           onPress={onSubmit(onPressSubmit)}
-          loading={isBusy}>
+          loading={isBusy}
+        >
           {i18n.common.finish}
         </Button>
       </View>
