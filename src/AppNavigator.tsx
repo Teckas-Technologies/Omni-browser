@@ -642,16 +642,16 @@ const AppNavigator = ({ isAppReady }: Props) => {
                 <Stack.Screen name="MissionPoolsByTabview" component={MissionPoolsByTabview} />
                 <Stack.Screen
                   name="CreatePassword"
-                  component={CreateMasterPassword}
+                  component={CreateUserName}
                   options={{ gestureEnabled: false }}
                 />
-                <Stack.Screen
+                {/* <Stack.Screen
                   name="CreateUserName"
                   component={CreateUserName}
                   options={{
                     gestureEnabled: false, // If you want to disable swipe back gesture
                   }}
-                />
+                /> */}
 
                 <Stack.Screen name="ManageAddressBook" component={ManageAddressBook} />
                 <Stack.Screen name="NetworkSettingDetail" component={NetworkSettingDetail} />

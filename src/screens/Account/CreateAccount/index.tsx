@@ -97,7 +97,7 @@ export const CreateAccount = ({ route: { params } }: CreateAccountProps) => {
   }, []);
 
   return (
-    <ContainerWithSubHeader onPressBack={onPressBack} disabled={isBusy} title={getHeaderTitle(currentViewStep)}>
+    <ContainerWithSubHeader onPressBack={onPressBack} disabled={isBusy} title=''>
       <>
         {!!seed && (
           <>

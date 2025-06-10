@@ -15,13 +15,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { setUsername } from 'stores/base/AccountState';
 import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
 import useHandlerHardwareBackPress from 'hooks/screen/useHandlerHardwareBackPress';
-import { RootNavigationProps } from 'routes/index';
-import type { CreateUserName as CreateUserNameProps, RootStackParamList } from 'routes/index';
+import { CreatePasswordProps, RootNavigationProps } from 'routes/index';
+
 const CreateUserName = ({
   route: {
     params: { pathName },
   },
-}: CreateUserNameProps) => {
+}: CreatePasswordProps) => {
   const navigation = useNavigation<RootNavigationProps>();
   const dispatch = useDispatch();
   const theme = useSubWalletTheme().swThemes;
@@ -43,17 +43,16 @@ const CreateUserName = ({
     dispatch(setUsername(username));
     navigation.reset({
       index: 1,
-      routes: [
-        { name: 'Home' },
-        { name: pathName as keyof RootStackParamList }, // 👈 fix: type assertion
-      ],
+      routes: [{ name: 'Home' }, { name: pathName }],
     });
-
     setIsBusy(false);
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -91,7 +90,8 @@ const CreateUserName = ({
       <TouchableOpacity
         style={[styles.nextButton, { backgroundColor: isValid ? '#70befa' : '#444' }]}
         disabled={!isValid || isBusy}
-        onPress={handleNext}>
+        onPress={handleNext}
+      >
         <Text style={styles.nextButtonText}>Next</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
