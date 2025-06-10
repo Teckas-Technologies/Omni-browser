@@ -17,6 +17,7 @@ const initialState: AccountState = {
   isReady: false,
   hasMasterPassword: false,
   isLocked: true,
+  username: '', // ✅ added
 
   // AccountsContext
   accounts: [],
@@ -74,8 +75,11 @@ const accountStateSlice = createSlice({
         reduxStatus: ReduxStatus.READY,
       };
     },
+    setUsername(state, action: PayloadAction<string>) {
+      state.username = action.payload;
+    },
   },
 });
 
-export const { updateAccountsContext, updateCurrentAccount, updateKeyringState } = accountStateSlice.actions;
+export const { updateAccountsContext, updateCurrentAccount, updateKeyringState,setUsername } = accountStateSlice.actions;
 export default accountStateSlice.reducer;

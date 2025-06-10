@@ -1,19 +1,11 @@
-import WordPhrase from 'components/common/WordPhrase';
-import AlertBox from 'components/design-system-ui/alert-box/simple';
 import React, { useCallback, useState } from 'react';
-import { ScrollView, Share, StyleProp, View } from 'react-native';
-import { Button, Icon, Typography } from 'components/design-system-ui';
+import { ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Button } from 'components/design-system-ui';
 import Text from 'components/Text';
-import {
-  ContainerHorizontalPadding,
-  FontMedium,
-  MarginBottomForSubmitButton,
-  ScrollViewStyle,
-  sharedStyles,
-} from 'styles/sharedStyles';
+import WordPhrase from 'components/common/WordPhrase';
 import { ColorMap } from 'styles/color';
 import i18n from 'utils/i18n/i18n';
-import { CheckCircle, Download } from 'phosphor-react-native';
+import { DownloadSimple } from 'phosphor-react-native';
 import { DownloadSeedPhraseModal } from 'components/common/DownloadSeedPhraseModal';
 
 interface Props {
@@ -21,91 +13,123 @@ interface Props {
   seed: string;
 }
 
-const bodyAreaStyle: StyleProp<any> = {
-  flex: 1,
-};
-
-const footerAreaStyle: StyleProp<any> = {
-  marginTop: 16,
-  ...MarginBottomForSubmitButton,
-};
-
-const infoBlockStyle: StyleProp<any> = {
-  ...ContainerHorizontalPadding,
-  marginBottom: 24,
-};
-
-const infoTextStyle: StyleProp<any> = {
-  ...sharedStyles.mainText,
-  ...FontMedium,
-  color: ColorMap.disabled,
-  textAlign: 'center',
-};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+    color: ColorMap.light,
+  },
+  description: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: ColorMap.disabled,
+    marginBottom: 24,
+  },
+  wordContainer: {
+    backgroundColor: ColorMap.dark2,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 24,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+  },
+  actionText: {
+    marginLeft: 8,
+    color: ColorMap.primary,
+    fontWeight: '500',
+  },
+  warningText: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: ColorMap.disabled,
+    marginBottom: 24,
+    fontWeight: '500',
+  },
+  continueButton: {
+    marginTop: 'auto',
+    marginBottom: 16,
+  },
+});
 
 export const InitSecretPhrase = ({ seed, onPressSubmit }: Props) => {
-  const [showDownloadConfirm, setDhowDownloadConfirm] = useState<boolean>(false);
+  const [showDownloadConfirm, setShowDownloadConfirm] = useState<boolean>(false);
 
   const onPressDownloadText = useCallback(() => {
-    setDhowDownloadConfirm(true);
+    setShowDownloadConfirm(true);
   }, []);
 
   const onPressDownloadButton = useCallback(() => {
-    setDhowDownloadConfirm(false);
+    setShowDownloadConfirm(false);
     Share.share({ title: 'Secret phrase', message: seed }).catch(e => {
       console.log('Share secret phrase error', e);
     });
   }, [seed]);
 
   const onCloseDownloadConfirmation = useCallback(() => {
-    setDhowDownloadConfirm(false);
+    setShowDownloadConfirm(false);
   }, []);
 
   return (
     <>
-      <View style={sharedStyles.layoutContainer}>
-        <View style={bodyAreaStyle}>
-          <ScrollView style={{ ...ScrollViewStyle, marginBottom: 16 }}>
-            <View style={infoBlockStyle}>
-              <Text style={infoTextStyle}>
-                {
-                  'Keep your seed phrase in a safe place and never disclose it. Anyone with the seed phrase can take control of your assets'
-                }
-              </Text>
-            </View>
-            <View style={{ gap: 24 }}>
-              <WordPhrase seedPhrase={seed} />
-            </View>
-          </ScrollView>
-          <AlertBox
-            title={i18n.warningTitle.whatIfLoseRecoveryPhrase}
-            description={
-              <>
-                There is no way to get back your recovery phrase if you lose it. Make sure you store them at someplace
-                safe which is accessible only to you.{' '}
-                <Typography.Text style={{ textDecorationLine: 'underline' }} onPress={onPressDownloadText}>
-                  Download seed phrase
-                  <View>
-                    <View style={{ marginLeft: 4, marginBottom: -4 }}>
-                      <Icon phosphorIcon={Download} weight="fill" size={'sm'} iconColor={'#737373'} />
-                    </View>
-                  </View>
-                </Typography.Text>
-              </>
-            }
-            type="warning"
-          />
+      <View style={styles.container}>
+        <Text style={styles.title}>Your recovery phrase</Text>
+        <Text style={styles.description}>
+          Download or copy these words in the right order and save them somewhere safe
+        </Text>
+
+        <View style={styles.wordContainer}>
+          <WordPhrase seedPhrase={seed} />
         </View>
-        <View style={footerAreaStyle}>
-          <Button icon={<Icon size={'lg'} phosphorIcon={CheckCircle} weight={'fill'} />} onPress={onPressSubmit}>
-            {i18n.buttonTitles.saveItSomeWhereSafe}
+
+        <View style={styles.actionRow}>
+          <Button
+            type="ghost"
+            style={styles.actionButton}
+            onPress={() => {/* Implement copy functionality */}}
+          >
+            <DownloadSimple size={20} color={ColorMap.primary} />
+            <Text style={styles.actionText}>Copy</Text>
+          </Button>
+
+          <Button
+            type="ghost"
+            style={styles.actionButton}
+            onPress={onPressDownloadText}
+          >
+            <DownloadSimple size={20} color={ColorMap.primary} />
+            <Text style={styles.actionText}>Download</Text>
           </Button>
         </View>
+
+        <Text style={styles.warningText}>Never forget your phrase</Text>
+
+        <Button
+          style={styles.continueButton}
+          onPress={onPressSubmit}
+        >
+          Continue
+        </Button>
       </View>
 
       <DownloadSeedPhraseModal
         modalVisible={showDownloadConfirm}
         onCloseModalVisible={onCloseDownloadConfirmation}
-        setVisible={setDhowDownloadConfirm}
+        setVisible={setShowDownloadConfirm}
         onPressDownloadBtn={onPressDownloadButton}
       />
     </>

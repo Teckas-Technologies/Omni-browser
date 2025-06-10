@@ -96,6 +96,10 @@ export type RootStackParamList = {
   CreateWallet: undefined;
    AddExistingWallet: undefined;
    ImportWallet: undefined;
+CreateUserName: { 
+    pathName: string;  // Add this parameter
+  };
+   
 };
 
 export type NavigationProps = NativeStackScreenProps<RootStackParamList>;
@@ -103,6 +107,7 @@ export type RootNavigationProps = NavigationProps['navigation'];
 export type RootRouteProps = NavigationProps['route'];
 export type CreateAccountProps = NativeStackScreenProps<RootStackParamList, 'CreateAccount'>;
 export type CreatePasswordProps = NativeStackScreenProps<RootStackParamList, 'CreatePassword'>;
+export type CreateUserName = NativeStackScreenProps<RootStackParamList, 'CreateUserName'>;
 export type EarningPreviewProps = NativeStackScreenProps<RootStackParamList, 'EarningPreview'>;
 export type EarningPreviewPoolsProps = NativeStackScreenProps<RootStackParamList, 'EarningPreviewPools'>;
 export type ImportSecretPhraseProps = NativeStackScreenProps<RootStackParamList, 'ImportSecretPhrase'>;

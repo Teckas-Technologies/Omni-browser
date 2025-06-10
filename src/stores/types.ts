@@ -176,6 +176,7 @@ export interface AccountState extends AccountsContext, KeyringState, AddressBook
   currentAccount: AccountJson | null;
   isNoAccount: boolean;
   isAllAccount: boolean;
+  username?: string; // ✅ Add this line
 }
 
 export interface RequestState extends ConfirmationsQueue, BaseReduxStore {

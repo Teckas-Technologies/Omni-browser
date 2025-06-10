@@ -1,14 +1,26 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'routes/index';
 import { Alert } from 'react-native';
+import { useSelector } from 'react-redux';
+import { RootState } from 'stores/index';
 
 export const FirstScreen = () => {
+
   type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+  const username = useSelector((state: RootState) => state.accountState.username);
+
 
   const navigation = useNavigation<NavigationProp>();
+  const handleNavigation = useCallback(() => {
+  if (username) {
+    navigation.navigate('CreateAccount', {});
+  } else {
+    navigation.navigate('CreateUserName');
+  }
+}, [username, navigation]);
   return (
     <View style={styles.container}>
       {/* Omni Logo Top */}
@@ -32,9 +44,7 @@ export const FirstScreen = () => {
         <View style={styles.buttonAlignRight}>
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() => {
-              navigation.navigate('CreateWallet');
-            }}>
+            onPress={handleNavigation}>
             <Text style={styles.primaryButtonText}>
               Create <Text style={styles.primaryButtonTextBlue}>New Wallet</Text>
             </Text>

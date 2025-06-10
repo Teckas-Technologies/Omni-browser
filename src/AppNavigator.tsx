@@ -100,6 +100,7 @@ import { EarningPreviewPools } from 'screens/EarningPreview/EarningPreviewPools'
 import { CreateWalletScreen } from 'screens/CreateWalletScreen';
 import AddExistingWallet from 'screens/AddExistingWallet';
 import ImportWalletScreen from 'screens/ImportWallet';
+import CreateUserName from 'screens/CreateUserName';
 
 interface Props {
   isAppReady: boolean;
@@ -644,6 +645,14 @@ const AppNavigator = ({ isAppReady }: Props) => {
                   component={CreateMasterPassword}
                   options={{ gestureEnabled: false }}
                 />
+                <Stack.Screen
+                  name="CreateUserName"
+                  component={CreateUserName}
+                  options={{
+                    gestureEnabled: false, // If you want to disable swipe back gesture
+                  }}
+                />
+
                 <Stack.Screen name="ManageAddressBook" component={ManageAddressBook} />
                 <Stack.Screen name="NetworkSettingDetail" component={NetworkSettingDetail} />
                 <Stack.Screen name="ImportNetwork" component={ImportNetwork} options={{ gestureEnabled: false }} />
