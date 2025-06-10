@@ -120,3 +120,4 @@ export const CreateAccount = ({ route: { params } }: CreateAccountProps) => {
     </ContainerWithSubHeader>
   );
 };
+
