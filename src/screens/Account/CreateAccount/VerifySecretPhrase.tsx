@@ -1,19 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, ScrollView, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import Text from 'components/Text';
-import { SeedWord } from 'components/SeedWord';
 import { Button, Icon } from 'components/design-system-ui';
 import { CheckCircle } from 'phosphor-react-native';
-import {
-  sharedStyles,
-  FontMedium,
-  ContainerHorizontalPadding,
-  MarginBottomForSubmitButton,
-} from 'styles/sharedStyles';
-import { ColorMap } from 'styles/color';
-import { shuffleArray } from 'utils/index';
 import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
-import { getWordKey } from 'components/SeedPhraseArea';
 import i18n from 'utils/i18n/i18n';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'routes/index';
@@ -26,70 +16,59 @@ interface Props {
   navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
-// Adjust this array to control which indexes (0-based) are blank/missing
-const missingIndexes = [0, 7, 10]; // i.e., positions 1, 8, and 11
+const getRandomMissingIndexes = (): number[] => {
+  const count = Math.floor(Math.random() * 2) + 3; // 3 or 4
+  const indexes = new Set<number>();
+  while (indexes.size < count) {
+    const rand = Math.floor(Math.random() * 12); // between 0 and 11
+    indexes.add(rand);
+  }
+  return Array.from(indexes).sort((a, b) => a - b);
+};
 
 export const VerifySecretPhrase = ({ onPressSubmit, seed, isBusy, navigation }: Props) => {
   const seedWords = seed.trim().split(' ');
-  const [filledWords, setFilledWords] = useState<(string | null)[]>([]);
-  const [wordOptions, setWordOptions] = useState<string[]>([]);
-  const [usedWordKeys, setUsedWordKeys] = useState<string[]>([]);
+  const [inputWords, setInputWords] = useState<string[]>([]);
   const theme = useSubWalletTheme().swThemes;
   const { onPress: onSubmit } = useUnlockModal(navigation);
 
+  const missingIndexes = useMemo(() => getRandomMissingIndexes(), []);
+
   useEffect(() => {
-    const initial = seedWords.map((word, idx) => (missingIndexes.includes(idx) ? null : word));
-    setFilledWords(initial);
-
-    const missingWords = missingIndexes.map(index => seedWords[index]);
-    const shuffled = shuffleArray([...missingWords]);
-    setWordOptions(shuffled);
-  }, [seed]);
-
-  const onSelectWord = (word: string) => {
-    const indexToFill = filledWords.findIndex(
-      (w, i) => missingIndexes.includes(i) && w === null
+    const initial = seedWords.map((word, idx) =>
+      missingIndexes.includes(idx) ? '' : word
     );
-    if (indexToFill === -1) return;
+    setInputWords(initial);
+  }, [seed, missingIndexes]);
 
-    const updated = [...filledWords];
-    updated[indexToFill] = word;
-    setFilledWords(updated);
-    setUsedWordKeys(prev => [...prev, getWordKey(word, indexToFill)]);
+  const handleInputChange = (text: string, index: number) => {
+    const updated = [...inputWords];
+    updated[index] = text.trim();
+    setInputWords(updated);
   };
 
-  const isAllCorrect = filledWords.every((word, i) => word === seedWords[i]);
+  const isAllCorrect = inputWords.every((word, i) => word === seedWords[i]);
 
-  const renderSeedSlots = () => {
+  const renderSeedFields = () => {
     return seedWords.map((_, index) => {
-      const word = filledWords[index];
-      const isMissing = missingIndexes.includes(index);
-      const title = word ? `${index + 1}. ${word}` : `${index + 1}. `;
+      const value = inputWords[index];
+      const label = `${index + 1}. `;
 
       return (
-        <SeedWord
-          key={`slot-${index}`}
-          style={{ margin: 4, minWidth: 120 }}
-          title={title}
-          disabled={!isMissing}
-          onPress={() => {}}
-        />
-      );
-    });
-  };
-
-  const renderWordOptions = () => {
-    return wordOptions.map((word, i) => {
-      const wordKey = getWordKey(word, i);
-      const isUsed = usedWordKeys.includes(wordKey);
-      return (
-        <SeedWord
-          key={wordKey}
-          style={{ margin: 4 }}
-          title={word}
-          disabled={isUsed}
-          onPress={() => onSelectWord(word)}
-        />
+        <View key={index} style={styles.wordButton}>
+          {missingIndexes.includes(index) ? (
+            <TextInput
+              style={styles.wordInput}
+              placeholder={`${label}`}
+              placeholderTextColor="#ffffff90"
+              value={value}
+              onChangeText={(text) => handleInputChange(text, index)}
+              autoCapitalize="none"
+            />
+          ) : (
+            <Text style={styles.wordText}>{`${label}${value}`}</Text>
+          )}
+        </View>
       );
     });
   };
@@ -98,34 +77,98 @@ export const VerifySecretPhrase = ({ onPressSubmit, seed, isBusy, navigation }: 
     <Icon phosphorIcon={CheckCircle} size="lg" iconColor={color} weight="fill" />
   );
 
-  return (
-    <View style={sharedStyles.layoutContainer}>
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
-        <View style={{ ...ContainerHorizontalPadding, marginBottom: 24 }}>
-          <Text style={{ ...sharedStyles.mainText, ...FontMedium, color: ColorMap.disabled, textAlign: 'center' }}>
-            {i18n.warningMessage.initSecretPhrase}
-          </Text>
-        </View>
+ return (
+  <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    style={{ flex: 1 }}
+    keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+  >
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Text style={styles.title}>Confirm secret recovery phrase</Text>
+      <Text style={styles.description}>
+        Enter the missed phrase that you have already saved
+      </Text>
 
-        <View style={{ paddingHorizontal: 14, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 24 }}>
-          {renderSeedSlots()}
-        </View>
+      <View style={styles.wordGrid}>{renderSeedFields()}</View>
 
-        <View style={{ paddingHorizontal: 14, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-          {renderWordOptions()}
-        </View>
-      </ScrollView>
+      <Button
+        style={styles.continueButton}
+        icon={getIcon(!isAllCorrect || isBusy ? theme.colorTextLight5 : theme.colorWhite)}
+        disabled={!isAllCorrect || isBusy}
+        onPress={onSubmit(onPressSubmit)}
+        loading={isBusy}
+      >
+        {i18n.common.finish}
+      </Button>
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
 
-      <View style={{ ...MarginBottomForSubmitButton, paddingTop: 16 }}>
-        <Button
-          icon={getIcon(!isAllCorrect || isBusy ? theme.colorTextLight5 : theme.colorWhite)}
-          disabled={!isAllCorrect || isBusy}
-          onPress={onSubmit(onPressSubmit)}
-          loading={isBusy}
-        >
-          {i18n.common.finish}
-        </Button>
-      </View>
-    </View>
-  );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: '#000',
+    padding: 30,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: '#fff',
+    marginBottom: 35,
+  },
+  description: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#aaa',
+    marginBottom: 24,
+  },
+  wordGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    paddingHorizontal: 40,
+    paddingVertical: 20,
+  },
+    wordButton: {
+    width: '48%',
+    height: 38, // fixed height for all boxes
+    backgroundColor: '#70befa',
+    borderRadius: 6,
+    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    
+  },
+  wordText: {
+    color: '#fff',
+    fontWeight: '500',
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 18, // matches fontSize, optional
+  },
+  wordInput: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    height: '100%', // make it fill the wordButton height
+    width: '100%', // match the width of the container
+  },
+
+  continueButton: {
+    marginTop: 'auto',
+    marginBottom: 16,
+    alignSelf: 'center',
+    width: '100%',
+  },
+});
+;
