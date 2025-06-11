@@ -8,19 +8,17 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'stores/index';
 
 export const FirstScreen = () => {
-
   type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
   const { hasMasterPassword } = useSelector((state: RootState) => state.accountState);
 
-
   const navigation = useNavigation<NavigationProp>();
   const handleNavigation = useCallback(() => {
-  if (hasMasterPassword) {
+    if (hasMasterPassword) {
       navigation.navigate('CreateAccount', {});
     } else {
       navigation.navigate('CreatePassword', { pathName: 'CreateAccount' });
     }
-}, [hasMasterPassword, navigation]);
+  }, [hasMasterPassword, navigation]);
 
   return (
     <View style={styles.container}>
@@ -43,9 +41,7 @@ export const FirstScreen = () => {
         </Text>
 
         <View style={styles.buttonAlignRight}>
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleNavigation}>
+          <TouchableOpacity style={styles.primaryButton} onPress={handleNavigation}>
             <Text style={styles.primaryButtonText}>
               Create <Text style={styles.primaryButtonTextBlue}>New Wallet</Text>
             </Text>
@@ -54,10 +50,9 @@ export const FirstScreen = () => {
       </View>
 
       {/* Already have a wallet link */}
-      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('ImportWallet')}>
-  <Text style={styles.secondaryText}>Already have a wallet</Text>
-</TouchableOpacity>
-
+      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('AddExistingWallet')}>
+        <Text style={styles.secondaryText}>Already have a wallet</Text>
+      </TouchableOpacity>
     </View>
   );
 };
