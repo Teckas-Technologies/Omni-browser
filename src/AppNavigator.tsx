@@ -642,7 +642,7 @@ const AppNavigator = ({ isAppReady }: Props) => {
                 <Stack.Screen name="MissionPoolsByTabview" component={MissionPoolsByTabview} />
                 <Stack.Screen
                   name="CreatePassword"
-                  component={CreateUserName}
+                  component={CreateMasterPassword}
                   options={{ gestureEnabled: false }}
                 />
                 {/* <Stack.Screen

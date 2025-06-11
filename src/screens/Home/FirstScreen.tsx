@@ -10,17 +10,18 @@ import { RootState } from 'stores/index';
 export const FirstScreen = () => {
 
   type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-  const username = useSelector((state: RootState) => state.accountState.username);
+  const { hasMasterPassword } = useSelector((state: RootState) => state.accountState);
 
 
   const navigation = useNavigation<NavigationProp>();
   const handleNavigation = useCallback(() => {
-  if (username) {
-    navigation.navigate('CreateAccount', {});
-  } else {
-    navigation.navigate('CreatePassword', { pathName: 'CreateAccount' });
-  }
-}, [username, navigation]);
+  if (hasMasterPassword) {
+      navigation.navigate('CreateAccount', {});
+    } else {
+      navigation.navigate('CreatePassword', { pathName: 'CreateAccount' });
+    }
+}, [hasMasterPassword, navigation]);
+
   return (
     <View style={styles.container}>
       {/* Omni Logo Top */}
@@ -53,9 +54,10 @@ export const FirstScreen = () => {
       </View>
 
       {/* Already have a wallet link */}
-      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('AddExistingWallet')}>
-        <Text style={styles.secondaryText}>Already have a wallet</Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('ImportWallet')}>
+  <Text style={styles.secondaryText}>Already have a wallet</Text>
+</TouchableOpacity>
+
     </View>
   );
 };

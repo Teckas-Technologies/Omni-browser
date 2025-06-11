@@ -1,162 +1,212 @@
 import React, { useMemo, useState } from 'react';
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from 'react-native';
-import { useDispatch } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { setUsername } from 'stores/base/AccountState';
+import { ContainerWithSubHeader } from 'components/ContainerWithSubHeader';
+import { Alert, Keyboard, Linking, ScrollView, Text, View } from 'react-native';
+import { CheckCircle, Info } from 'phosphor-react-native';
+import { Button, Icon, Typography } from 'components/design-system-ui';
 import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
-import useHandlerHardwareBackPress from 'hooks/screen/useHandlerHardwareBackPress';
+import useFormControl, { FormControlConfig } from 'hooks/screen/useFormControl';
+import { PasswordField } from 'components/Field/Password';
+import { validatePassword, validatePasswordMatched } from 'screens/Shared/AccountNamePasswordCreation';
+import { keyringChangeMasterPassword } from 'messaging/index';
+import { useNavigation } from '@react-navigation/native';
 import { CreatePasswordProps, RootNavigationProps } from 'routes/index';
+import CreateMasterPasswordStyle from './style';
+import { KeypairType } from '@polkadot/util-crypto/types';
+import useHandlerHardwareBackPress from 'hooks/screen/useHandlerHardwareBackPress';
+import i18n from 'utils/i18n/i18n';
+import { RootState } from 'stores/index';
+import { useSelector } from 'react-redux';
+import { createKeychainPassword } from 'utils/account';
+import InputCheckBox from 'components/Input/InputCheckBox';
+
+function checkValidateForm(isValidated: Record<string, boolean>) {
+  return isValidated.password && isValidated.repeatPassword;
+}
 
 const CreateMasterPassword = ({
   route: {
-    params: { pathName },
+    params: { pathName, state },
   },
 }: CreatePasswordProps) => {
   const navigation = useNavigation<RootNavigationProps>();
-  const dispatch = useDispatch();
+  const { isUseBiometric } = useSelector(({ mobileSettings }: RootState) => mobileSettings);
   const theme = useSubWalletTheme().swThemes;
-  useHandlerHardwareBackPress(true);
-
-  const [username, setUsernameInput] = useState('');
+  const _style = CreateMasterPasswordStyle(theme);
   const [isBusy, setIsBusy] = useState(false);
-
-  const isValid = useMemo(() => /^[a-zA-Z0-9_]{3,15}$/.test(username.trim()), [username]);
-
-  const handleUsernameChange = (text: string) => {
-    setUsernameInput(text);
+  const [errors, setErrors] = useState<string[]>([]);
+  const [checked, setChecked] = useState<boolean>(false);
+  useHandlerHardwareBackPress(true);
+  const formConfig: FormControlConfig = {
+    password: {
+      name: i18n.common.walletPassword,
+      value: '',
+      validateFunc: validatePassword,
+      require: true,
+    },
+    repeatPassword: {
+      name: i18n.common.repeatWalletPassword,
+      value: '',
+      validateFunc: (value: string, formValue: Record<string, string>) => {
+        return validatePasswordMatched(value, formValue.password);
+      },
+      require: true,
+    },
   };
 
-  const handleNext = () => {
-    if (!isValid) return;
-
-    setIsBusy(true);
-    dispatch(setUsername(username));
-    navigation.reset({
-      index: 1,
-      routes: [{ name: 'Home' }, { name: pathName }],
-    });
-    setIsBusy(false);
+  const onComplete = async () => {
+    if (pathName === 'CreateAccount') {
+      navigation.reset({
+        index: 1,
+        routes: [{ name: 'Home' }, { name: pathName, params: { keyTypes: state as KeypairType[] } }],
+      });
+    } else if (pathName === 'MigratePassword') {
+    } else {
+      navigation.reset({
+        index: 1,
+        routes: [{ name: 'Home' }, { name: pathName }],
+      });
+    }
   };
+
+  const onSubmit = () => {
+    if (checkValidateForm(formState.isValidated)) {
+      const password = formState.data.password;
+
+      if (password) {
+        setIsBusy(true);
+        keyringChangeMasterPassword({
+          createNew: true,
+          newPassword: password,
+        })
+          .then(res => {
+            if (!res.status) {
+              setErrors(res.errors);
+            } else {
+              onComplete();
+              // TODO: complete
+              if (isUseBiometric) {
+                createKeychainPassword(password);
+              }
+            }
+          })
+          .catch(e => {
+            setErrors([e.message]);
+          })
+          .finally(() => {
+            setIsBusy(false);
+          });
+      }
+    }
+  };
+
+  const { formState, onChangeValue, onSubmitField } = useFormControl(formConfig, {
+    onSubmitForm: onSubmit,
+  });
+
+  const showAlertWarning = () => {
+    Alert.alert(i18n.title.tickTheCheckbox, i18n.message.masterPasswordWarning, [
+      { text: i18n.buttonTitles.iUnderStand },
+    ]);
+  };
+
+  const _onChangePasswordValue = (currentValue: string) => {
+    if (formState.data.repeatPassword) {
+      onChangeValue('repeatPassword')('');
+    }
+    onChangeValue('password')(currentValue);
+  };
+
+  const isDisabled = useMemo(() => {
+    return !checkValidateForm(formState.isValidated) || (errors && errors.length > 0) || isBusy;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors, formState.isValidated.password, formState.isValidated.repeatPassword, isBusy]);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="person-circle-outline" size={24} color="#fff" />
-        </TouchableOpacity>
+    <ContainerWithSubHeader
+      showLeftBtn={pathName !== 'MigratePassword'}
+      onPressBack={() => navigation.goBack()}
+      disabled={isBusy}
+      rightIcon={Info}
+      disableRightButton={isBusy}
+      title={i18n.header.createAPassword}
+      style={{ width: '100%' }}>
+      <ScrollView style={_style.bodyWrapper} keyboardShouldPersistTaps={'handled'} showsVerticalScrollIndicator={false}>
+        <Typography.Text style={_style.instructionTextStyle}>
+          {i18n.createPassword.createPasswordMessage}
+        </Typography.Text>
+
+        <PasswordField
+          ref={formState.refs.password}
+          label={formState.labels.password}
+          defaultValue={formState.data.password}
+          onChangeText={_onChangePasswordValue}
+          errorMessages={formState.errors.password}
+          onSubmitField={onSubmitField('password')}
+          placeholder={i18n.placeholder.enterPassword}
+          isBusy={isBusy}
+          autoFocus
+        />
+
+        <PasswordField
+          ref={formState.refs.repeatPassword}
+          label={formState.labels.repeatPassword}
+          defaultValue={formState.data.repeatPassword}
+          onChangeText={onChangeValue('repeatPassword')}
+          errorMessages={formState.errors.repeatPassword}
+          onSubmitField={checked ? onSubmitField('repeatPassword') : () => Keyboard.dismiss()}
+          placeholder={i18n.placeholder.confirmPassword}
+          isBusy={isBusy}
+        />
+
+        <Typography.Text size={'sm'} style={{ color: theme.colorTextLight4 }}>
+          {i18n.warning.warningPasswordMessage}
+        </Typography.Text>
+      </ScrollView>
+
+      <View style={_style.footerAreaStyle}>
+        <InputCheckBox
+          needFocusCheckBox
+          labelStyle={{ flex: 1 }}
+          checked={checked}
+          label={
+            <Typography.Text style={{ color: theme.colorWhite, marginLeft: theme.marginXS, flex: 1 }}>
+              {i18n.buttonTitles.masterPasswordCheckbox}
+              <Text
+                style={{
+                  textDecorationStyle: 'solid',
+                  textDecorationLine: 'underline',
+                  color: theme.colorPrimary,
+                  textDecorationColor: theme.colorPrimary,
+                }}
+                onPress={() =>
+                  Linking.openURL(
+                    'https://docs.subwallet.app/main/mobile-app-user-guide/getting-started/create-apply-change-and-what-to-do-when-forgot-password',
+                  )
+                }>
+                {i18n.buttonTitles.learnMore}
+              </Text>
+            </Typography.Text>
+          }
+          onPress={() => setChecked(!checked)}
+          checkBoxSize={20}
+        />
+        <Button
+          disabled={isDisabled}
+          showDisableStyle={!checked}
+          icon={
+            <Icon
+              phosphorIcon={CheckCircle}
+              size={'lg'}
+              weight={'fill'}
+              iconColor={isDisabled || !checked ? theme.colorTextLight5 : theme.colorTextLight1}
+            />
+          }
+          onPress={checked ? onSubmit : showAlertWarning}>
+          {i18n.buttonTitles.continue}
+        </Button>
       </View>
-
-      {/* Title and Description */}
-      <Text style={styles.title}>Create new wallet</Text>
-      <Text style={styles.description}>
-        Pellentesque suscipit fringilla libero eu ullamcorper. Cras risus eros, faucibus sit
-      </Text>
-
-      {/* Username Field */}
-      <Text style={styles.label}>Enter Username</Text>
-      <TextInput
-        style={styles.input}
-        value={username}
-        onChangeText={handleUsernameChange}
-        placeholder=""
-        placeholderTextColor="#999"
-      />
-
-      {/* Validation Message */}
-      {username.length > 0 && (
-        <Text style={[styles.validationText, { color: isValid ? 'green' : 'red' }]}>
-          {isValid ? 'That username fits well!' : '3–15 characters, alphanumeric or underscore only'}
-        </Text>
-      )}
-
-      {/* NEXT Button */}
-      <TouchableOpacity
-        style={[styles.nextButton, { backgroundColor: isValid ? '#70befa' : '#444' }]}
-        disabled={!isValid || isBusy}
-        onPress={handleNext}
-      >
-        <Text style={styles.nextButtonText}>Next</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+    </ContainerWithSubHeader>
   );
 };
 
 export default CreateMasterPassword;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-    padding: 24,
-    marginTop: 30,
-    position: 'relative',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 32,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  description: {
-    color: '#ccc',
-    fontSize: 14,
-    marginBottom: 32,
-  },
-  label: {
-    color: '#fff',
-    fontSize: 14,
-    marginBottom: 6,
-    fontWeight: '600',
-  },
-  input: {
-    backgroundColor: '#111',
-    borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: '#fff',
-    fontSize: 16,
-    marginTop: 7,
-  },
-  validationText: {
-    marginTop: 8,
-    fontSize: 14,
-  },
-  nextButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 24,
-    right: 24,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  nextButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-});

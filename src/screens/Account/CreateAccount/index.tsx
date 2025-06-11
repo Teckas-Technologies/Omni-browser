@@ -97,27 +97,30 @@ export const CreateAccount = ({ route: { params } }: CreateAccountProps) => {
   }, []);
 
   return (
-    <ContainerWithSubHeader onPressBack={onPressBack} disabled={isBusy} title=''>
-      <>
-        {!!seed && (
-          <>
-            {currentViewStep === ViewStep.INIT_SP && (
-              <InitSecretPhrase seed={seed} onPressSubmit={onPressSubmitInitSecretPhrase} />
-            )}
-            {currentViewStep === ViewStep.VERIFY_SP && (
-              <VerifySecretPhrase seed={seed} onPressSubmit={onCreateAccount} isBusy={isBusy} navigation={navigation} />
-            )}
-          </>
-        )}
+  <ContainerWithSubHeader onPressBack={onPressBack} disabled={isBusy} title=''>
+    <>
+      {!!seed && (
+        <>
+          {currentViewStep === ViewStep.INIT_SP && (
+            <InitSecretPhrase seed={seed} onPressSubmit={onPressSubmitInitSecretPhrase} />
+          )}
+          {currentViewStep === ViewStep.VERIFY_SP && (
+            <VerifySecretPhrase seed={seed} onPressSubmit={onCreateAccount} isBusy={isBusy} navigation={navigation} />
+          )}
+        </>
+      )}
 
+      {/* Show modal only on first render, not when coming back from VERIFY_SP */}
+      {showSeedPhraseInstruction && currentViewStep === ViewStep.INIT_SP && (
         <TnCSeedPhraseModal
           onBackButtonPress={() => navigation.goBack()}
           onPressSubmit={onPressSubmitTnCSeedPhraseModal}
           setVisible={setShowSeedPhraseInstruction}
           isVisible={showSeedPhraseInstruction}
         />
-      </>
-    </ContainerWithSubHeader>
-  );
-};
+      )}
+    </>
+  </ContainerWithSubHeader>
+);
+}
 
