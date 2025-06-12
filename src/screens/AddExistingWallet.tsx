@@ -29,7 +29,7 @@ const attachAccountRef = useRef<ModalRef | undefined>(undefined);
 
 
   const handleImportWallet = () => {
-    importAccountRef.current?.onOpenModal(); // ✅ Open modal directly
+    importAccountRef.current?.onOpenModal(); 
   };
 
   return (

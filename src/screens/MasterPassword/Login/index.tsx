@@ -259,12 +259,20 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.fullscreen}>
           <SafeAreaView style={styles.container}>
-            <Image src={Images.SubWalletLogoGradient} style={{ width: 66, height: 100 }} />
-            <View style={styles.subLogo}>
-              <SVGImages.SubwalletStyled width={139} height={23} />
-            </View>
-            <Typography.Text size="sm" style={styles.subTitle}>
-              Polkadot, Substrate & Ethereum wallet
+            <Image src={Images.SubWalletLogoGradient} style={{ width: 120, height: 100 }} />
+
+            <Typography.Text
+              style={[
+                styles.subTitle,
+                {
+                  fontSize: 30,
+                  marginBottom: 24, // Reduced from 40
+                  marginTop: 30,
+                  lineHeight: 34, 
+                  fontWeight:'600'
+                },
+              ]}>
+              Omni Browser
             </Typography.Text>
             {authMethod === 'master-password' && (
               <>

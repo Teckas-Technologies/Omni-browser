@@ -250,9 +250,11 @@ export const TokenGroups = () => {
   }, [navigation]);
 
   return (
-    <ScreenContainer
-      gradientBackground={isTotalBalanceDecrease ? GradientBackgroundColorSet[1] : GradientBackgroundColorSet[0]}>
-      <>
+   <ScreenContainer gradientBackground={GradientBackgroundColorSet[GradientBackgroundColorSet.length - 1]}>
+
+     
+
+     <>
         <Header />
 
         <TokensLayout

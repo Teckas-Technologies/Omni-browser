@@ -17,14 +17,17 @@ import { addConnection } from 'messaging/index';
 import { ToastType } from 'react-native-toast-notifications';
 import i18n from 'utils/i18n/i18n';
 
+/**
+ * Only include EVM chains (eip155)
+ */
 export const chainsToWalletConnectChainInfos = (
   chainMap: Record<string, _ChainInfo>,
   chains: string[],
 ): Array<WalletConnectChainInfo> => {
-  return chains.map(chain => {
-    const [namespace, info] = chain.split(':');
-
-    if (namespace === WALLET_CONNECT_EIP155_NAMESPACE) {
+  return chains
+    .filter(chain => chain.startsWith(WALLET_CONNECT_EIP155_NAMESPACE)) // ✅ Only EVM
+    .map(chain => {
+      const [, info] = chain.split(':');
       const chainInfo = findChainInfoByChainId(chainMap, parseInt(info));
 
       return {
@@ -32,22 +35,7 @@ export const chainsToWalletConnectChainInfos = (
         slug: chainInfo?.slug || chain,
         supported: !!chainInfo,
       };
-    } else if (namespace === WALLET_CONNECT_POLKADOT_NAMESPACE) {
-      const chainInfo = findChainInfoByHalfGenesisHash(chainMap, info);
-
-      return {
-        chainInfo,
-        slug: chainInfo?.slug || chain,
-        supported: !!chainInfo,
-      };
-    } else {
-      return {
-        chainInfo: null,
-        slug: chain,
-        supported: false,
-      };
-    }
-  });
+    });
 };
 
 export const getWCAccountList = (
@@ -61,7 +49,6 @@ export const getWCAccountList = (
 
   rawList.forEach(info => {
     const [, , address] = info.split(':');
-
     rawMap[address] = address;
   });
 
@@ -88,12 +75,25 @@ export const getWCAccountList = (
   return Object.values(convertMap);
 };
 
+/**
+ * Only allow WalletConnect URIs that include eip155 (EVM)
+ */
 export const isValidUri = (uri: string) => {
-  return !validWalletConnectUri(uri);
+  if (!validWalletConnectUri(uri)) return false;
+
+  try {
+    const decoded = decodeURIComponent(uri);
+    return decoded.includes(WALLET_CONNECT_EIP155_NAMESPACE); // ✅ Ensure only EVM
+  } catch (e) {
+    return false;
+  }
 };
 
 const runned: Record<string, boolean> = {};
 
+/**
+ * Initiate WalletConnect pairing only if it's a valid EVM URI
+ */
 export const connectWalletConnect = (wcUrl: string, toast?: ToastType) => {
   if (isValidUri(wcUrl)) {
     if (!runned[wcUrl]) {
@@ -107,6 +107,6 @@ export const connectWalletConnect = (wcUrl: string, toast?: ToastType) => {
       });
     }
   } else {
-    toast?.show('Invalid uri');
+    toast?.show('Invalid or non-EVM WalletConnect URI');
   }
 };

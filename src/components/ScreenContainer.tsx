@@ -25,6 +25,8 @@ export const GradientBackgroundColorSet: [string, string][] = [
   ['rgba(76, 234, 172, 0.15)', 'rgba(217, 217, 217, 0)'],
   ['rgba(234, 76, 76, 0.15)', 'rgba(217, 217, 217, 0)'],
   ['rgba(0, 75, 255, 0.15)', 'rgba(217, 217, 217, 0)'],
+  ['rgba(112, 190, 250, 0.75)', 'rgba(217, 217, 217, 0)'],
+  // ['rgba(112, 190, 250, 0.5)', 'rgba(217, 217, 217, 0)'],
 ];
 
 export const ScreenContainer = ({
