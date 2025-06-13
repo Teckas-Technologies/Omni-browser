@@ -706,7 +706,7 @@ function History({
           setTimeout(() => openFilterModal(), 100);
         }}>
         <View style={{ position: 'relative', flex: 1 }}>
-          <LinearGradient
+          {/* <LinearGradient
             locations={[0, 0.5]}
             colors={gradientBackground}
             style={{
@@ -715,6 +715,16 @@ function History({
               top: 0,
               left: 0,
               right: 0,
+            }}
+          /> */}
+          <View
+            style={{
+              height: 388,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: '#040404',
             }}
           />
 

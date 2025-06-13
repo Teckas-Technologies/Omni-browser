@@ -28,7 +28,7 @@ enum FilterValue {
 let cachePendingAssetMap: Record<string, boolean> = {};
 
 export const CustomTokenSetting = () => {
-  const assetItems = useChainAssets({ isFungible: true }).chainAssets;
+  const assetItems = useChainAssets({ isFungible: true, chainTypes: 'evm' }).chainAssets;
   const assetSettingMap = useSelector((state: RootState) => state.assetRegistry.assetSettingMap);
   const navigation = useNavigation<RootNavigationProps>();
   const [pendingAssetMap, setPendingAssetMap] = useState<Record<string, boolean>>(cachePendingAssetMap);

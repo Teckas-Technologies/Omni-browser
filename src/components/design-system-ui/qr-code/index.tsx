@@ -6,7 +6,7 @@ import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
 import QRCodeStyled, { GradientProps, QRCodeMessage } from 'react-native-qrcode-styled';
 import Svg from 'react-native-svg';
 
-const logo = require('./sw-logo.png');
+const logo = require('./omni_logo.png');
 const gradient: GradientProps = {
   type: 'radial',
   options: {
@@ -69,6 +69,7 @@ const QRCode: React.FC<SWQRCodeProps> = ({
         logo={{
           href: icon,
           padding: 6,
+          size: 32,
         }}
         gradient={gradient}
         errorCorrectionLevel={errorLevel}

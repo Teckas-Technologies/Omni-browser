@@ -1,34 +1,33 @@
-import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from 'stores/index';
-import { _isChainSupportEvmNft, _isChainSupportWasmNft } from '@subwallet/extension-base/services/chain-service/utils';
+import { _isChainSupportEvmNft } from '@subwallet/extension-base/services/chain-service/utils';
 import { _ChainInfo } from '@subwallet/chain-list/types';
 import useChainAssets from 'hooks/chain/useChainAssets';
 
-function filterContractTypes(chainInfoMap: Record<string, _ChainInfo>) {
+export default function useGetContractSupportedChains(): Record<string, _ChainInfo> {
+  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
+  const availableChains = useChainAssets().availableChains;
+
+  // 🧾 Log all chains before filtering
+  const allSlugs = Object.values(chainInfoMap).map(chain => chain.slug);
+  console.log('🌐 All Chains from chainInfoMap:', allSlugs);
+  console.log('🎯 Available Chains:', availableChains);
+
   const filteredChainInfoMap: Record<string, _ChainInfo> = {};
 
   Object.values(chainInfoMap).forEach(chainInfo => {
-    if (_isChainSupportEvmNft(chainInfo) || _isChainSupportWasmNft(chainInfo)) {
-      filteredChainInfoMap[chainInfo.slug] = chainInfo;
+    const slug = chainInfo.slug;
+
+    if (
+      availableChains.includes(slug) &&
+      _isChainSupportEvmNft(chainInfo)
+    ) {
+      filteredChainInfoMap[slug] = chainInfo;
     }
   });
 
+  // ✅ Log filtered EVM chains
+  console.log('✅ EVM Chains:', Object.keys(filteredChainInfoMap));
+
   return filteredChainInfoMap;
-}
-
-export default function useGetContractSupportedChains(): Record<string, _ChainInfo> {
-  const availableChains = useChainAssets().availableChains;
-  const chainInfoMap = useSelector((state: RootState) => state.chainStore.chainInfoMap);
-
-  return useMemo(() => {
-    const filteredChainInfoMap: Record<string, _ChainInfo> = {};
-    Object.values(chainInfoMap).forEach(chainInfo => {
-      if (availableChains.includes(chainInfo.slug)) {
-        filteredChainInfoMap[chainInfo.slug] = chainInfo;
-      }
-    });
-
-    return filterContractTypes(filteredChainInfoMap);
-  }, [chainInfoMap, availableChains]);
 }

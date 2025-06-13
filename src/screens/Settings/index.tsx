@@ -37,6 +37,7 @@ import env from 'react-native-config';
 import { RootState } from 'stores/index';
 import { useSelector } from 'react-redux';
 import { MissionCategoryType } from 'screens/Home/Browser/MissionPool/predefined';
+import { Image } from 'react-native';
 
 const settingTitleStyle: StyleProp<any> = {
   fontSize: 12,
@@ -212,7 +213,8 @@ export const Settings = ({ navigation: drawerNavigation }: DrawerContentComponen
     <SubScreenContainer
       title={i18n.header.settings}
       navigation={navigation}
-      icon={<SVGImages.Logo width={24} height={24} />}
+      icon={<Image source={require('assets/omni_logo.png')} style={{ width: 28, height: 28 }} />}
+
       rightIcon={X}
       onPressLeftBtn={() => (drawerNavigation ? drawerNavigation.closeDrawer() : navigation.goBack())}
       onPressRightIcon={() => (drawerNavigation ? drawerNavigation.closeDrawer() : navigation.goBack())}>
@@ -272,7 +274,7 @@ export const Settings = ({ navigation: drawerNavigation }: DrawerContentComponen
             ))}
           </View>
 
-          <Text style={settingTitleStyle}>{i18n.settings.communityAndSupport.toUpperCase()}</Text>
+          {/* <Text style={settingTitleStyle}>{i18n.settings.communityAndSupport.toUpperCase()}</Text>
 
           <View style={{ gap: theme.paddingXS }}>
             {settingList[3].map(setting => (
@@ -290,7 +292,7 @@ export const Settings = ({ navigation: drawerNavigation }: DrawerContentComponen
                 onPress={setting.onPress}
               />
             ))}
-          </View>
+          </View> */}
 
           <Button
             style={{ marginTop: 16 }}
@@ -301,9 +303,9 @@ export const Settings = ({ navigation: drawerNavigation }: DrawerContentComponen
             {i18n.settings.lock}
           </Button>
         </ScrollView>
-        <Text
+        {/* <Text
           onPress={onPressVersionNumber}
-          style={versionAppStyle}>{`SubWallet v${getVersion()} (${getBuildNumber()}) b-${bundleVersion}`}</Text>
+          style={versionAppStyle}>{`SubWallet v${getVersion()} (${getBuildNumber()}) b-${bundleVersion}`}</Text> */}
       </>
     </SubScreenContainer>
   );

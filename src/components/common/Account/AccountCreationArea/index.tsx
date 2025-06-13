@@ -58,12 +58,12 @@ export const AccountCreationArea = ({
       icon: Wallet,
       label: i18n.importAccount.importByMetaMaskPrivateKey,
     },
-    // {
-    //   key: 'qrCode',
-    //   backgroundColor: '#2565E6',
-    //   icon: QrCode,
-    //   label: i18n.importAccount.importByQRCode,
-    // },
+    {
+      key: 'qrCode',
+      backgroundColor: '#2565E6',
+      icon: QrCode,
+      label: i18n.importAccount.importByQRCode,
+    },
   ];
 
   const attachAccountActions = [
