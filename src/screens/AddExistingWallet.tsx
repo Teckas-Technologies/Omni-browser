@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from 'routes/index';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { ModalRef } from 'types/modalRef';
+import { AccountCreationArea } from 'components/common/Account/AccountCreationArea';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -19,8 +21,15 @@ const AddExistingWallet = () => {
   const navigation = useNavigation<NavigationProp>();
   const screenWidth = Dimensions.get('window').width;
 
+  // Ref for triggering the modal
+
+const importAccountRef = useRef<ModalRef | undefined>(undefined);
+const createAccountRef = useRef<ModalRef | undefined>(undefined);
+const attachAccountRef = useRef<ModalRef | undefined>(undefined);
+
+
   const handleImportWallet = () => {
-    navigation.navigate('ImportWallet'); // Navigate to ImportWallet screen
+    importAccountRef.current?.onOpenModal(); 
   };
 
   return (
@@ -35,7 +44,6 @@ const AddExistingWallet = () => {
 
       {/* Main Content */}
       <View style={styles.contentContainer}>
-        {/* Logo with background */}
         <ImageBackground
           source={require('assets/omni_symbol_bg.png')}
           style={styles.logoBackground}
@@ -48,20 +56,28 @@ const AddExistingWallet = () => {
           />
         </ImageBackground>
 
-        {/* Title and description */}
         <Text style={styles.title}>Add your Wallet</Text>
         <Text style={styles.description}>
           Click the import wallet to set up your wallet
         </Text>
       </View>
 
-      {/* Full width button */}
+      {/* Import Wallet Button */}
       <TouchableOpacity 
         style={[styles.importButton, { width: screenWidth - 40 }]}
-        onPress={handleImportWallet} // Added onPress handler
+        onPress={handleImportWallet}
       >
         <Text style={styles.importButtonText}>Import Wallet</Text>
       </TouchableOpacity>
+
+      {/* Include the AccountCreationArea with ref to trigger modal */}
+     <AccountCreationArea
+  createAccountRef={createAccountRef}
+  importAccountRef={importAccountRef}
+  attachAccountRef={attachAccountRef}
+  allowToShowSelectType={true}
+/>
+
     </View>
   );
 };
@@ -128,15 +144,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   importButton: {
-  position: 'absolute',
-  bottom: 60,
-  backgroundColor: '#1d2939',
-  paddingVertical: 14,
-  borderRadius: 12,
-  alignItems: 'center',
-  alignSelf: 'center', // ✅ Center horizontally
-},
-
+    position: 'absolute',
+    bottom: 60,
+    backgroundColor: '#1d2939',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
   importButtonText: {
     color: 'white',
     fontSize: 16,

@@ -46,24 +46,24 @@ export const AccountCreationArea = ({
       icon: Leaf,
       label: i18n.importAccount.importFromSeedPhrase,
     },
-    {
-      key: 'restoreJson',
-      backgroundColor: '#E68F25',
-      icon: FileJs,
-      label: i18n.importAccount.importFromJson,
-    },
+    // {
+    //   key: 'restoreJson',
+    //   backgroundColor: '#E68F25',
+    //   icon: FileJs,
+    //   label: i18n.importAccount.importFromJson,
+    // },
     {
       key: 'privateKey',
       backgroundColor: '#4D4D4D',
       icon: Wallet,
       label: i18n.importAccount.importByMetaMaskPrivateKey,
     },
-    {
-      key: 'qrCode',
-      backgroundColor: '#2565E6',
-      icon: QrCode,
-      label: i18n.importAccount.importByQRCode,
-    },
+    // {
+    //   key: 'qrCode',
+    //   backgroundColor: '#2565E6',
+    //   icon: QrCode,
+    //   label: i18n.importAccount.importByQRCode,
+    // },
   ];
 
   const attachAccountActions = [
