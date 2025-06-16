@@ -9,6 +9,7 @@ import { DAppInfo } from 'types/browser';
 import { BrowserItem } from 'components/Browser/BrowserItem';
 import createStylesheet from '../styles/BrowserHome';
 import { getHostName } from 'utils/browser';
+import { EVM_DAPPS } from 'constants/evmDApps';
 
 interface SectionListProps {
   data: RecommendedListType[];
@@ -35,10 +36,10 @@ const SectionList: React.FC<SectionListProps> = ({ data, renderItem }): JSX.Elem
   );
 };
 interface RecommendSectionProps {
-  dApps: DAppInfo[] | undefined;
   onPressSectionItem: (item: DAppInfo) => void;
 }
-const RecommendSection: React.FC<RecommendSectionProps> = ({ dApps, onPressSectionItem }) => {
+const RecommendSection: React.FC<RecommendSectionProps> = ({ onPressSectionItem }) => {
+
   const navigation = useNavigation<RootNavigationProps>();
   const stylesheet = createStylesheet();
 
@@ -60,24 +61,20 @@ const RecommendSection: React.FC<RecommendSectionProps> = ({ dApps, onPressSecti
     [onPressSectionItem, stylesheet.browserItem],
   );
 
-  const recommendedList = useMemo((): RecommendedListType[] | [] => {
-    if (!dApps) {
-      return [];
-    }
-    const sectionData = [];
-    for (let i = 0; i < 20; i += 4) {
-      const section = {
-        data: dApps.slice(i, i + 4),
-      };
-      sectionData.push(section);
-    }
-    return sectionData;
-  }, [dApps]);
+  const recommendedList = useMemo((): RecommendedListType[] => {
+  const sectionData: RecommendedListType[] = [];
+  for (let i = 0; i < EVM_DAPPS.length; i += 4) {
+    sectionData.push({ data: EVM_DAPPS.slice(i, i + 4) });
+  }
+  return sectionData;
+}, []);
+
 
   return (
     <>
       <SectionHeader
-        title={i18n.browser.recommended}
+        // title={i18n.browser.recommended}
+        title='Featured dApps'
         actionTitle={i18n.browser.seeAll}
         onPress={() => navigation.navigate('BrowserListByTabview', { type: 'RECOMMENDED' })}
       />

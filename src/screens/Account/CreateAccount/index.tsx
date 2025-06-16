@@ -26,7 +26,7 @@ function getHeaderTitle(viewStep: number) {
   }
 }
 
-const defaultKeyTypes = [SUBSTRATE_ACCOUNT_TYPE, EVM_ACCOUNT_TYPE];
+const defaultKeyTypes = [ EVM_ACCOUNT_TYPE];
 
 export const CreateAccount = ({ route: { params } }: CreateAccountProps) => {
   const isInstructionHidden = mmkvStore.getBoolean('hide-seed-phrase-instruction');

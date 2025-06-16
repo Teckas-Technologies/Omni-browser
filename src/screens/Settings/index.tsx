@@ -111,18 +111,18 @@ export const Settings = ({ navigation: drawerNavigation }: DrawerContentComponen
           onPress: () => navigation.navigate('History', {}),
           backgroundColor: '#2595E6',
         },
-        {
-          icon: Parachute,
-          title: i18n.header.missionPools,
-          rightIcon: (
-            <View style={{ flexDirection: 'row', gap: theme.paddingSM + 2, alignItems: 'center' }}>
-              {!!activeMissionPoolNumb && <Badge value={activeMissionPoolNumb} />}
-              <Icon phosphorIcon={CaretRight} size={'sm'} iconColor={theme.colorTextLight3} />
-            </View>
-          ),
-          onPress: () => navigation.navigate('MissionPoolsByTabview', { type: 'all' }),
-          backgroundColor: '#108959',
-        },
+        // {
+        //   icon: Parachute,
+        //   title: i18n.header.missionPools,
+        //   rightIcon: (
+        //     <View style={{ flexDirection: 'row', gap: theme.paddingSM + 2, alignItems: 'center' }}>
+        //       {!!activeMissionPoolNumb && <Badge value={activeMissionPoolNumb} />}
+        //       <Icon phosphorIcon={CaretRight} size={'sm'} iconColor={theme.colorTextLight3} />
+        //     </View>
+        //   ),
+        //   onPress: () => navigation.navigate('MissionPoolsByTabview', { type: 'all' }),
+        //   backgroundColor: '#108959',
+        // },
       ],
       [
         {

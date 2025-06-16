@@ -71,7 +71,7 @@ export const BrowserListByTabview = ({ route, navigation }: BrowserListByTabview
 
   const navigationType: Record<string, string> = {
     BOOKMARK: i18n.browser.favorite,
-    RECOMMENDED: i18n.browser.recommended,
+    RECOMMENDED: 'Featured dApps',
   };
   const title = navigationType[route.params.type];
   const av = new Animated.Value(0);

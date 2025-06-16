@@ -119,7 +119,7 @@ export const BrowserScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
         {/* @ts-ignore */}
         <FakeSearchInput style={stylesheet.fakeSearch} onPress={() => navigation.navigate('BrowserSearch')} />
 
-        <Tab.Navigator
+        {/* <Tab.Navigator
           initialLayout={initialLayout}
           sceneContainerStyle={transparent}
           initialRouteName="TabBrowserHome0"
@@ -146,7 +146,9 @@ export const BrowserScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
               />
             );
           })}
-        </Tab.Navigator>
+        </Tab.Navigator> */}
+        <BrowserHome />
+
       </>
     </ScreenContainer>
   );

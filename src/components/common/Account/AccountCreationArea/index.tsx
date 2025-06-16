@@ -191,40 +191,40 @@ export const AccountCreationArea = ({
     }, 300);
   };
 
-  const attachAccountFunc = (item: ActionItemType) => {
-    let pathName: keyof RootStackParamList;
+  // const attachAccountFunc = (item: ActionItemType) => {
+  //   let pathName: keyof RootStackParamList;
 
-    if (item.key === 'ledger') {
-      show(i18n.notificationMessage.comingSoon);
-      return;
-    } else if (item.key === 'polkadotVault') {
-      pathName = 'ConnectParitySigner';
-    } else if (item.key === 'keystone') {
-      pathName = 'ConnectKeystone';
-    } else {
-      pathName = 'AttachReadOnly';
-    }
+  //   if (item.key === 'ledger') {
+  //     show(i18n.notificationMessage.comingSoon);
+  //     return;
+  //   } else if (item.key === 'polkadotVault') {
+  //     pathName = 'ConnectParitySigner';
+  //   } else if (item.key === 'keystone') {
+  //     pathName = 'ConnectKeystone';
+  //   } else {
+  //     pathName = 'AttachReadOnly';
+  //   }
 
-    attachAccountRef && attachAccountRef.current?.onCloseModal();
-    setTimeout(() => {
-      if (hasMasterPassword) {
-        // @ts-ignore
-        navigation.navigate(pathName);
-      } else {
-        // @ts-ignore
-        navigation.navigate('CreatePassword', { pathName: pathName });
-      }
-    }, 300);
-  };
+  //   attachAccountRef && attachAccountRef.current?.onCloseModal();
+  //   setTimeout(() => {
+  //     if (hasMasterPassword) {
+  //       // @ts-ignore
+  //       navigation.navigate(pathName);
+  //     } else {
+  //       // @ts-ignore
+  //       navigation.navigate('CreatePassword', { pathName: pathName });
+  //     }
+  //   }, 300);
+  // };
 
   return (
     <>
-      <AccountActionSelectModal
+      {/* <AccountActionSelectModal
         accActionRef={createAccountRef}
         modalTitle={i18n.header.createNewAcc}
         items={createAccountAction}
         onSelectItem={createAccountFunc}
-      />
+      /> */}
 
       <SelectAccountTypeModal selectTypeRef={selectTypeRef} onConfirm={onSelectAccountTypes} />
 
@@ -235,13 +235,13 @@ export const AccountCreationArea = ({
         onSelectItem={importAccountActionFunc}
       />
 
-      <AccountActionSelectModal
+      {/* <AccountActionSelectModal
         accActionRef={attachAccountRef}
         modalTitle={i18n.header.attachAnAcc}
         items={attachAccountActions}
         onSelectItem={attachAccountFunc}
         toastRef={toastRef}
-      />
+      /> */}
     </>
   );
 };
