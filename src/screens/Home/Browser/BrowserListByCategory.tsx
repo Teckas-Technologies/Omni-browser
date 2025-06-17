@@ -12,6 +12,7 @@ import { useSubWalletTheme } from 'hooks/useSubWalletTheme';
 import { CategoryEmptyList } from 'screens/Home/Browser/Shared/CategoryEmptyList';
 import { browserListItemHeight, browserListSeparator } from 'constants/itemHeight';
 import { useGetDAppList } from 'hooks/static-content/useGetDAppList';
+import { EVM_DAPPS } from 'constants/evmDApps';
 
 export interface BrowserListByCategoryProps {
   searchString: string;
@@ -31,56 +32,63 @@ const BrowserListByCategory: React.FC<NativeStackScreenProps<RootStackParamList>
   } = useGetDAppList();
   const bookmarkedItems = useSelector((state: RootState) => state.browser.bookmarks);
 
-  const listByCategory = useMemo((): DAppInfo[] => {
-    if (!dApps || dApps.length === 0) {
-      return [];
-    }
-    // Get Data by Bookmark
-    if (navigationType && navigationType === 'BOOKMARK') {
-      const bookmarkedData = bookmarkedItems.map(bookmarkedItem => {
-        // if bookmark item is a pre-defined dapp
-        const bookmarkedDApp = dApps.find(
-          dapp => bookmarkedItem.url.includes(dapp.url) && dapp.title.toLowerCase().includes(searchString),
-        );
+const listByCategory = useMemo((): DAppInfo[] => {
+  if (!dApps || dApps.length === 0) {
+    return [];
+  }
 
-        if (bookmarkedDApp) {
-          // if that dapp inside "all" tab or inside its categories
-          if (route.name === 'all' || bookmarkedDApp?.categories.includes(route.name)) {
-            return { ...bookmarkedDApp, url: bookmarkedItem.url, title: bookmarkedItem.name };
-          }
+  // Get Data by Bookmark
+  if (navigationType === 'BOOKMARK') {
+    const bookmarkedData = bookmarkedItems.map(bookmarkedItem => {
+      const bookmarkedDApp = dApps.find(
+        dapp => bookmarkedItem.url.includes(dapp.url) && dapp.title.toLowerCase().includes(searchString),
+      );
 
-          return undefined;
-        }
-
-        // if bookmarked item is not a pre-defined dapp or a webpage
-        if (route.name === 'all') {
-          return {
-            title: bookmarkedItem.name,
-            id: bookmarkedItem.id,
-            url: bookmarkedItem.url,
-            icon: '',
-            categories: [],
-          };
+      if (bookmarkedDApp) {
+        if (route.name === 'all' || bookmarkedDApp?.categories.includes(route.name)) {
+          return { ...bookmarkedDApp, url: bookmarkedItem.url, title: bookmarkedItem.name };
         }
 
         return undefined;
-      });
-      return bookmarkedData.filter(item => item !== undefined) as DAppInfo[];
-    }
-
-    // Get Data by Category
-    if (route.name === 'all') {
-      if (searchString) {
-        return dApps.filter(item => item.title.toLowerCase().includes(searchString));
       }
-      return dApps;
+
+      if (route.name === 'all') {
+        return {
+          title: bookmarkedItem.name,
+          id: bookmarkedItem.id,
+          url: bookmarkedItem.url,
+          icon: '',
+          categories: [],
+        };
+      }
+
+      return undefined;
+    });
+
+    return bookmarkedData.filter(item => item !== undefined) as DAppInfo[];
+  }
+
+  // ✅ Get Data by Recommended
+  if (navigationType === 'RECOMMENDED') {
+    if (route.name === 'all') {
+      return EVM_DAPPS;
     }
-    const data = dApps.filter(
-      item => item.categories.includes(route.name) && item.title.toLowerCase().includes(searchString),
-    );
-    return data;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dApps, searchString, bookmarkedItems]);
+    return EVM_DAPPS.filter(dapp => dapp.categories.includes(route.name));
+  }
+
+  // Get Data by Category
+  if (route.name === 'all') {
+    if (searchString) {
+      return dApps.filter(item => item.title.toLowerCase().includes(searchString));
+    }
+    return dApps;
+  }
+
+  return dApps.filter(
+    item => item.categories.includes(route.name) && item.title.toLowerCase().includes(searchString),
+  );
+}, [dApps, searchString, bookmarkedItems, route.name, navigationType]);
+
 
   const getItemLayout = (data: DAppInfo[] | null | undefined, index: number) => ({
     index,

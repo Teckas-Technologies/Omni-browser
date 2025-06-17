@@ -172,7 +172,8 @@ export const BrowserSearch = ({ route: { params } }: BrowserSearchProps) => {
 
     if (_recommendItems.length) {
       result.push({
-        title: i18n.browser.recommended,
+        // title: i18n.browser.recommended,
+        title:'Featured dApps',
         data: _recommendItems.map(item => ({
           name: item.title,
           url: item.url,

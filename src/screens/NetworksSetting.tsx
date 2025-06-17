@@ -8,8 +8,6 @@ import { RootNavigationProps, NetworksSettingProps } from 'routes/index';
 import { updateChainActiveState } from 'messaging/index';
 import {
   _isChainEvmCompatible,
-  _isCustomChain,
-  _isSubstrateChain,
 } from '@subwallet/extension-base/services/chain-service/utils';
 import { EmptyList } from 'components/EmptyList';
 import i18n from 'utils/i18n/i18n';
@@ -18,62 +16,12 @@ import useChainInfoWithStateAndStatus, {
 } from 'hooks/chain/useChainInfoWithStateAndStatus';
 
 let chainKeys: Array<string> | undefined;
-
 let cachePendingChainMap: Record<string, boolean> = {};
 
-enum FilterValue {
-  ENABLED = 'enabled',
-  DISABLED = 'disabled',
-  CUSTOM = 'custom',
-  SUBSTRATE = 'substrate',
-  EVM = 'evm',
-}
-
 const searchFunction = (items: ChainInfoWithStateAnhStatus[], searchString: string) => {
-  if (!searchString) {
-    return items;
-  }
+  if (!searchString) return items;
 
   return items.filter(network => network && network.name.toLowerCase().includes(searchString.toLowerCase()));
-};
-
-const filterFunction = (items: ChainInfoWithStateAnhStatus[], filters: string[]) => {
-  if (!filters.length) {
-    return items;
-  }
-
-  return items.filter(item => {
-    for (const filter of filters) {
-      switch (filter) {
-        case FilterValue.CUSTOM:
-          if (_isCustomChain(item.slug)) {
-            return true;
-          }
-          break;
-        case FilterValue.ENABLED:
-          if (item.active) {
-            return true;
-          }
-          break;
-        case FilterValue.DISABLED:
-          if (!item.active) {
-            return true;
-          }
-          break;
-        case FilterValue.SUBSTRATE:
-          if (_isSubstrateChain(item)) {
-            return true;
-          }
-          break;
-        case FilterValue.EVM:
-          if (_isChainEvmCompatible(item)) {
-            return true;
-          }
-          break;
-      }
-    }
-    return false;
-  });
 };
 
 const processChainMap = (
@@ -83,18 +31,18 @@ const processChainMap = (
 ): ChainInfoWithStateAnhStatus[] => {
   if (!chainKeys || updateKeys) {
     chainKeys = Object.keys(chainInfoMap)
-      .filter(key => Object.keys(chainInfoMap[key].providers).length > 0)
+      .filter(key => {
+        const chain = chainInfoMap[key];
+        return (
+          Object.keys(chain.providers).length > 0 &&
+          _isChainEvmCompatible(chain) // ✅ Only EVM-compatible
+        );
+      })
       .sort((a, b) => {
         const aActive = pendingKeys.includes(a) ? cachePendingChainMap[a] : chainInfoMap[a].active;
         const bActive = pendingKeys.includes(b) ? cachePendingChainMap[b] : chainInfoMap[b].active;
 
-        if (aActive === bActive) {
-          return 0;
-        } else if (aActive) {
-          return -1;
-        } else {
-          return 1;
-        }
+        return aActive === bActive ? 0 : aActive ? -1 : 1;
       });
   }
 
@@ -108,25 +56,16 @@ export const NetworksSetting = ({ route: { params } }: NetworksSettingProps) => 
   const [isToggleItem, setToggleItem] = useState(false);
   const [pendingChainMap, setPendingChainMap] = useState<Record<string, boolean>>(cachePendingChainMap);
   const [currentChainList, setCurrentChainList] = useState(processChainMap(chainInfoMap));
-  const FILTER_OPTIONS = [
-    { label: i18n.filterOptions.evmChains, value: FilterValue.EVM },
-    { label: i18n.filterOptions.substrateChains, value: FilterValue.SUBSTRATE },
-    { label: i18n.filterOptions.customChains, value: FilterValue.CUSTOM },
-    { label: i18n.filterOptions.enabledChains, value: FilterValue.ENABLED },
-    { label: i18n.filterOptions.disabledChains, value: FilterValue.DISABLED },
-  ];
 
   useEffect(() => {
     setPendingChainMap(prevPendingChainMap => {
-      const _prevPendingChainMap = { ...prevPendingChainMap };
-      Object.entries(_prevPendingChainMap).forEach(([key, val]) => {
+      const _prev = { ...prevPendingChainMap };
+      Object.entries(_prev).forEach(([key, val]) => {
         if (chainInfoMap[key].active === val) {
-          // @ts-ignore
-          delete _prevPendingChainMap[key];
+          delete _prev[key];
         }
       });
-
-      return _prevPendingChainMap;
+      return _prev;
     });
   }, [chainInfoMap]);
 
@@ -141,6 +80,7 @@ export const NetworksSetting = ({ route: { params } }: NetworksSettingProps) => 
   const onToggleItem = (item: ChainInfoWithStateAnhStatus) => {
     setToggleItem(true);
     setPendingChainMap({ ...pendingChainMap, [item.slug]: !item.active });
+
     const reject = () => {
       console.warn('Toggle network request failed!');
       // @ts-ignore
@@ -150,52 +90,44 @@ export const NetworksSetting = ({ route: { params } }: NetworksSettingProps) => 
 
     updateChainActiveState(item.slug, !item.active)
       .then(result => {
-        if (!result) {
-          reject();
-        }
+        if (!result) reject();
       })
       .catch(reject);
   };
 
-  const renderItem = ({ item }: ListRenderItemInfo<ChainInfoWithStateAnhStatus>) => {
-    return (
-      <NetworkAndTokenToggleItem
-        isDisableSwitching={
-          item.slug === 'polkadot' || item.slug === 'kusama' || Object.keys(pendingChainMap).includes(item.slug)
-        }
-        key={`${item.slug}-${item.name}`}
-        itemName={item.name}
-        itemKey={item.slug}
-        connectionStatus={item.connectionStatus}
-        // @ts-ignore
-        isEnabled={
-          Object.keys(pendingChainMap).includes(item.slug)
-            ? pendingChainMap[item.slug]
-            : chainInfoMap[item.slug]?.active || false
-        }
-        onValueChange={() => onToggleItem(item)}
-        showEditButton
-        onPressEditBtn={() => {
-          navigation.navigate('NetworkSettingDetail', { chainSlug: item.slug });
-          setToggleItem(false);
-        }}
-      />
-    );
-  };
+  const renderItem = ({ item }: ListRenderItemInfo<ChainInfoWithStateAnhStatus>) => (
+    <NetworkAndTokenToggleItem
+      isDisableSwitching={Object.keys(pendingChainMap).includes(item.slug)}
+      key={`${item.slug}-${item.name}`}
+      itemName={item.name}
+      itemKey={item.slug}
+      connectionStatus={item.connectionStatus}
+      // @ts-ignore
+      isEnabled={
+        Object.keys(pendingChainMap).includes(item.slug)
+          ? pendingChainMap[item.slug]
+          : chainInfoMap[item.slug]?.active || false
+      }
+      onValueChange={() => onToggleItem(item)}
+      showEditButton
+      onPressEditBtn={() => {
+        navigation.navigate('NetworkSettingDetail', { chainSlug: item.slug });
+        setToggleItem(false);
+      }}
+    />
+  );
 
-  const renderListEmptyComponent = () => {
-    return (
-      <EmptyList
-        icon={ListChecks}
-        title={i18n.emptyScreen.networkSettingsTitle}
-        message={i18n.emptyScreen.networkSettingsMessage}
-        addBtnLabel={i18n.header.importNetwork}
-        onPressAddBtn={() => {
-          navigation.navigate('ImportNetwork');
-        }}
-      />
-    );
-  };
+  const renderListEmptyComponent = () => (
+    <EmptyList
+      icon={ListChecks}
+      title={i18n.emptyScreen.networkSettingsTitle}
+      message={i18n.emptyScreen.networkSettingsMessage}
+      addBtnLabel={i18n.header.importNetwork}
+      onPressAddBtn={() => {
+        navigation.navigate('ImportNetwork');
+      }}
+    />
+  );
 
   return (
     <FlatListScreen
@@ -215,10 +147,8 @@ export const NetworksSetting = ({ route: { params } }: NetworksSettingProps) => 
       renderListEmptyComponent={renderListEmptyComponent}
       searchFunction={searchFunction}
       renderItem={renderItem}
-      filterOptions={FILTER_OPTIONS}
-      isShowFilterBtn
-      filterFunction={filterFunction}
       isShowListWrapper={true}
+      isShowFilterBtn={false} // ✅ Hiding filter button
     />
   );
 };

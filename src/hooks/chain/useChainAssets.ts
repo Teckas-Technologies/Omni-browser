@@ -5,7 +5,7 @@ import { _ChainAsset, _ChainStatus } from '@subwallet/chain-list/types';
 import {
   _isAssetFungibleToken,
   _isChainEvmCompatible,
-  _isSubstrateChain,
+  // _isSubstrateChain, // ❌ Not needed for EVM-only
 } from '@subwallet/extension-base/services/chain-service/utils';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,7 +16,7 @@ interface _ChainAssetFilters {
   isFungible?: boolean;
   isAvailableChain?: boolean;
   isActiveChain?: boolean;
-  chainTypes?: 'substrate' | 'evm';
+  chainTypes?: 'evm'; // 👈 only allow 'evm'
 }
 
 export default function useChainAssets({
@@ -45,9 +45,9 @@ export default function useChainAssets({
     return availableChains.filter(slug => _isChainEvmCompatible(chainInfoMap[slug]));
   }, [availableChains, chainInfoMap]);
 
-  const substrateChains = useMemo(() => {
-    return availableChains.filter(slug => _isSubstrateChain(chainInfoMap[slug]));
-  }, [availableChains, chainInfoMap]);
+  // const substrateChains = useMemo(() => {
+  //   return availableChains.filter(slug => _isSubstrateChain(chainInfoMap[slug]));
+  // }, [availableChains, chainInfoMap]);
 
   const activeAssets = useMemo(() => {
     return Object.entries(assetSettingMap)
@@ -74,14 +74,9 @@ export default function useChainAssets({
       assets = assets.filter(asset => activeAssets.includes(asset.slug));
     }
 
-    if (chainTypes) {
-      if (chainTypes.includes('evm')) {
-        assets = assets.filter(asset => evmChains.includes(asset.originChain));
-      }
-
-      if (chainTypes.includes('substrate')) {
-        assets = assets.filter(asset => substrateChains.includes(asset.originChain));
-      }
+    // Only EVM filtering supported
+    if (chainTypes === 'evm') {
+      assets = assets.filter(asset => evmChains.includes(asset.originChain));
     }
 
     return assets;
@@ -96,12 +91,17 @@ export default function useChainAssets({
     isActiveChain,
     isAvailableChain,
     isFungible,
-    substrateChains,
+    // substrateChains, // not used
   ]);
 
   const chainAssetRegistry = useMemo(() => {
     return Object.fromEntries(chainAssets.map(asset => [asset.slug, asset]));
   }, [chainAssets]);
 
-  return { chainAssets, chainAssetRegistry, availableChains, evmChains };
+  return {
+    chainAssets,
+    chainAssetRegistry,
+    availableChains,
+    evmChains,
+  };
 }

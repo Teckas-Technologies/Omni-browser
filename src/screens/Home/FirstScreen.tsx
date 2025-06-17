@@ -6,6 +6,7 @@ import { RootStackParamList } from 'routes/index';
 import { Alert } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from 'stores/index';
+import { EVM_ACCOUNT_TYPE } from 'constants/index';
 
 export const FirstScreen = () => {
   type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -14,7 +15,9 @@ export const FirstScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const handleNavigation = useCallback(() => {
     if (hasMasterPassword) {
-      navigation.navigate('CreateAccount', {});
+      navigation.navigate('CreateAccount', {
+        keyTypes: [EVM_ACCOUNT_TYPE],
+      });
     } else {
       navigation.navigate('CreatePassword', { pathName: 'CreateAccount' });
     }

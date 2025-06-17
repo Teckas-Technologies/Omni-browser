@@ -73,7 +73,7 @@ export const DAppAccessScreen = () => {
     return getDAppItems(authUrlMap);
   }, [authUrlMap]);
   const FILTER_OPTIONS = [
-    { label: i18n.filterOptions.substrateDApp, value: FilterValue.SUBSTRATE },
+    // { label: i18n.filterOptions.substrateDApp, value: FilterValue.SUBSTRATE },
     { label: i18n.filterOptions.evmDApp, value: FilterValue.ETHEREUM },
     { label: i18n.filterOptions.blockedDApp, value: FilterValue.BLOCKED },
     { label: i18n.filterOptions.connectedDApp, value: FilterValue.CONNECTED },
