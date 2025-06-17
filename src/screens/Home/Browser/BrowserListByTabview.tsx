@@ -12,6 +12,7 @@ import { ThemeTypes } from 'styles/themes';
 import i18n from 'utils/i18n/i18n';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import { useGetDAppList } from 'hooks/static-content/useGetDAppList';
+import { EVM_DAPP_CATEGORIES } from 'constants/evmDApps';
 
 type RoutesType = {
   key: string;
@@ -64,10 +65,12 @@ export const BrowserListByTabview = ({ route, navigation }: BrowserListByTabview
     browserDApps: { dAppCategories },
   } = useGetDAppList();
 
-  const allTabRoutes = useMemo(() => {
-    const categoryTabRoutes = dAppCategories ? dAppCategories?.map(item => ({ key: item.slug, title: item.name })) : [];
-    return [{ key: 'all', title: i18n.common.all }, ...categoryTabRoutes];
-  }, [dAppCategories]);
+  // const allTabRoutes = useMemo(() => {
+  //   const categoryTabRoutes = dAppCategories ? dAppCategories?.map(item => ({ key: item.slug, title: item.name })) : [];
+  //   return [{ key: 'all', title: i18n.common.all }, ...categoryTabRoutes];
+  // }, [dAppCategories]);
+
+  const allTabRoutes = EVM_DAPP_CATEGORIES;
 
   const navigationType: Record<string, string> = {
     BOOKMARK: i18n.browser.favorite,

@@ -17,7 +17,7 @@ export const ImageLogosMap = {
   transak: require('./transak.png'),
   moonpay: require('./moonpay.png'),
   onramper: require('./onramper.png'),
-  default: require('./default.png'),
+  default: require('./omni_logo.png'),
   banxa: require('./banxa.png'),
   coinbase: require('./coinbase.png'),
   stellaswap: require('./stellaswap.png'),

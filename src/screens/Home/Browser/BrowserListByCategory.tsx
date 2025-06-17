@@ -32,63 +32,68 @@ const BrowserListByCategory: React.FC<NativeStackScreenProps<RootStackParamList>
   } = useGetDAppList();
   const bookmarkedItems = useSelector((state: RootState) => state.browser.bookmarks);
 
-const listByCategory = useMemo((): DAppInfo[] => {
-  if (!dApps || dApps.length === 0) {
-    return [];
-  }
+  const listByCategory = useMemo((): DAppInfo[] => {
+    if (!EVM_DAPPS || EVM_DAPPS.length === 0) {
+      return [];
+    }
 
-  // Get Data by Bookmark
-  if (navigationType === 'BOOKMARK') {
-    const bookmarkedData = bookmarkedItems.map(bookmarkedItem => {
-      const bookmarkedDApp = dApps.find(
-        dapp => bookmarkedItem.url.includes(dapp.url) && dapp.title.toLowerCase().includes(searchString),
-      );
+    if (navigationType === 'BOOKMARK') {
+      const bookmarkedData = bookmarkedItems.map(bookmarkedItem => {
+        const bookmarkedDApp = EVM_DAPPS.find(
+          dapp => bookmarkedItem.url.includes(dapp.url) && dapp.title.toLowerCase().includes(searchString),
+        );
 
-      if (bookmarkedDApp) {
-        if (route.name === 'all' || bookmarkedDApp?.categories.includes(route.name)) {
-          return { ...bookmarkedDApp, url: bookmarkedItem.url, title: bookmarkedItem.name };
+        if (bookmarkedDApp) {
+          if (route.name === 'all' || bookmarkedDApp.categories.includes(route.name)) {
+            return { ...bookmarkedDApp, url: bookmarkedItem.url, title: bookmarkedItem.name };
+          }
+          return undefined;
+        }
+
+        if (route.name === 'all') {
+          return {
+            title: bookmarkedItem.name,
+            id: bookmarkedItem.id,
+            url: bookmarkedItem.url,
+            icon: '',
+            categories: [],
+          };
         }
 
         return undefined;
-      }
+      });
+
+      return bookmarkedData.filter(item => item !== undefined) as DAppInfo[];
+    }
+
+    if (navigationType === 'RECOMMENDED') {
+      console.log('Route:', route.name);
+      console.log(
+        'Matching Categories:',
+        EVM_DAPPS.map(d => d.categories),
+      );
 
       if (route.name === 'all') {
-        return {
-          title: bookmarkedItem.name,
-          id: bookmarkedItem.id,
-          url: bookmarkedItem.url,
-          icon: '',
-          categories: [],
-        };
+        return EVM_DAPPS;
       }
+      return EVM_DAPPS.filter(dapp =>
+        dapp.categories.some(category => category.toLowerCase() === route.name.toLowerCase()),
+      );
+    }
 
-      return undefined;
-    });
-
-    return bookmarkedData.filter(item => item !== undefined) as DAppInfo[];
-  }
-
-  // ✅ Get Data by Recommended
-  if (navigationType === 'RECOMMENDED') {
     if (route.name === 'all') {
+      if (searchString) {
+        return EVM_DAPPS.filter(item => item.title.toLowerCase().includes(searchString));
+      }
       return EVM_DAPPS;
     }
-    return EVM_DAPPS.filter(dapp => dapp.categories.includes(route.name));
-  }
 
-  // Get Data by Category
-  if (route.name === 'all') {
-    if (searchString) {
-      return dApps.filter(item => item.title.toLowerCase().includes(searchString));
-    }
-    return dApps;
-  }
-
-  return dApps.filter(
-    item => item.categories.includes(route.name) && item.title.toLowerCase().includes(searchString),
-  );
-}, [dApps, searchString, bookmarkedItems, route.name, navigationType]);
-
+    return EVM_DAPPS.filter(
+      item =>
+        item.categories.some(category => category.toLowerCase() === route.name.toLowerCase()) &&
+        item.title.toLowerCase().includes(searchString),
+    );
+  }, [searchString, bookmarkedItems, route.name, navigationType]);
 
   const getItemLayout = (data: DAppInfo[] | null | undefined, index: number) => ({
     index,

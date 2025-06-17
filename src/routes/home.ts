@@ -20,6 +20,7 @@ export type HomeStackParamList = {
   Staking: NavigatorScreenParams<StakingScreenStackParamList> | undefined;
   Browser: NavigatorScreenParams<BrowserHomeProps>;
   Earning: NavigatorScreenParams<EarningScreenStackParamList>;
+  AI: undefined;
 };
 
 type NavigationProps = NativeStackScreenProps<HomeStackParamList>;

@@ -23,6 +23,7 @@ import { Button } from 'components/design-system-ui';
 import i18n from 'utils/i18n/i18n';
 import { browserListItemHeight, browserListSeparator } from 'constants/itemHeight';
 import { useGetDAppList } from 'hooks/static-content/useGetDAppList';
+import { EVM_DAPPS } from 'constants/evmDApps';
 
 type SearchItemType = {
   logo?: string;
@@ -60,9 +61,9 @@ const TOTAL_ITEM_HEIGHT = ITEM_HEIGHT + ITEM_SEPARATOR;
 
 export const BrowserSearch = ({ route: { params } }: BrowserSearchProps) => {
   const historyItems = useSelector((state: RootState) => state.browser.history);
-  const {
-    browserDApps: { dApps },
-  } = useGetDAppList();
+  // const {
+  //   browserDApps: { dApps },
+  // } = useGetDAppList();
   const theme = useSubWalletTheme().swThemes;
   const stylesheet = createStylesheet(theme);
   const navigation = useNavigation<RootNavigationProps>();
@@ -133,8 +134,7 @@ export const BrowserSearch = ({ route: { params } }: BrowserSearchProps) => {
         ? historyItems
         : historyItems.filter(i => i.name.toLowerCase().includes(searchStringRef.current.toLowerCase()))
     ).map(history => {
-      const dapp = dApps?.find(app => history.url.includes(app.url));
-
+      const dapp = EVM_DAPPS?.find(app => history.url.includes(app.url));
       const hostName = getHostName(history.url);
 
       return {
@@ -146,6 +146,7 @@ export const BrowserSearch = ({ route: { params } }: BrowserSearchProps) => {
         subtitle: hostName,
       };
     });
+
     const result: SectionItem[] = [];
 
     if (searchStringRef.current) {
@@ -164,16 +165,18 @@ export const BrowserSearch = ({ route: { params } }: BrowserSearchProps) => {
       });
     }
 
-    const _recommendItems = dApps
+    const _recommendItems = EVM_DAPPS
       ? !searchStringRef.current
-        ? dApps.slice(0, 20)
-        : dApps.filter(dApp => dApp.title.toLowerCase().includes(searchStringRef.current.toLowerCase())).slice(0, 10)
+        ? EVM_DAPPS.slice(0, 20)
+        : EVM_DAPPS.filter(dApp => dApp.title.toLowerCase().includes(searchStringRef.current.toLowerCase())).slice(
+            0,
+            10,
+          )
       : [];
 
     if (_recommendItems.length) {
       result.push({
-        // title: i18n.browser.recommended,
-        title:'Featured dApps',
+        title: 'Featured dApps',
         data: _recommendItems.map(item => ({
           name: item.title,
           url: item.url,
@@ -187,7 +190,7 @@ export const BrowserSearch = ({ route: { params } }: BrowserSearchProps) => {
     }
 
     return result;
-  }, [dApps, historyItems]);
+  }, [historyItems]);
 
   useEffect(() => {
     const newItem = getSectionItems();
