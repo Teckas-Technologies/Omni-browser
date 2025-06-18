@@ -101,6 +101,9 @@ import { CreateWalletScreen } from 'screens/CreateWalletScreen';
 import AddExistingWallet from 'screens/AddExistingWallet';
 import ImportWalletScreen from 'screens/ImportWallet';
 import CreateUserName from 'screens/CreateUserName';
+import ChatScreen from 'screens/AI/ChatScreen';
+import ImageGeneratorScreen from 'screens/AI/ImageGeneratorScreen';
+import GeneratedImage from 'screens/AI/GeneratedImage';
 
 interface Props {
   isAppReady: boolean;
@@ -697,6 +700,9 @@ const AppNavigator = ({ isAppReady }: Props) => {
                 <Stack.Screen name="AttachReadOnly" component={AttachReadOnly} options={{ gestureEnabled: false }} />
                 <Stack.Screen name="ImportQrCode" component={ImportQrCode} />
                 <Stack.Screen name="DeriveAccount" component={DeriveAccount} />
+                 <Stack.Screen name="ImageGeneratorScreen" component={ImageGeneratorScreen} />
+                 <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
+                  <Stack.Screen name="GeneratedImage" component={GeneratedImage} />
               </Stack.Group>
               <Stack.Group
                 screenOptions={{

@@ -1,11 +1,15 @@
 import React from 'react';
-import { Image } from 'react-native';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import { Image, View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from 'routes/index'; // Adjust path if needed
 
 const { width } = Dimensions.get('window');
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const AIScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
+
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>
@@ -14,7 +18,7 @@ const AIScreen = () => {
       </Text>
 
       <View style={styles.cardsContainer}>
-        <TouchableOpacity style={[styles.card, styles.alignLeft]}>
+        <TouchableOpacity style={[styles.card, styles.alignLeft]} onPress={() => navigation.navigate('ChatScreen')}>
           <Text style={styles.cardText}>
             Engage in{'\n'}conversation{'\n'}with OMNI.
           </Text>
@@ -25,7 +29,9 @@ const AIScreen = () => {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.card, styles.alignRight]}>
+        <TouchableOpacity
+          style={[styles.card, styles.alignRight]}
+          onPress={() => navigation.navigate('ImageGeneratorScreen')}>
           <Text style={styles.cardText}>
             Image{'\n'}generate{'\n'}with OMNI
           </Text>

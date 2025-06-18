@@ -96,6 +96,9 @@ export type RootStackParamList = {
   CreateWallet: undefined;
    AddExistingWallet: undefined;
    ImportWallet: undefined;
+   ChatScreen: undefined;
+    ImageGeneratorScreen: undefined;
+    GeneratedImage:undefined;
 CreateUserName: { 
     pathName: string;  // Add this parameter
   };
