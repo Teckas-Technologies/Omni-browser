@@ -252,12 +252,13 @@
     "tickTheCheckbox": "Tick the checkbox"
   },
   "tabName": {
-    "tokens": "Tokens",
+    "tokens": "Wallet",
     "nfts": "NFTs",
     "crowdloans": "Crowdloans",
     "staking": "Staking",
-    "browser": "dApps",
-    "earning": "Earning"
+    "browser": "Browser",
+    "earning": "Earning",
+    "ai":"AI"
   },
   "welcomeScreen": {
     "welcomeBackTitle": "Welcome back!",

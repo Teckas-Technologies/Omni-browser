@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ImageBackground } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ImageBackground,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const features = [
   { title: 'Wallet', icon: require('assets/omni_wallet_icon.png') },
@@ -9,10 +17,23 @@ const features = [
 ];
 
 const FeatureQuickAccess = () => {
+  const navigation = useNavigation();
+
+  const handlePress = (title: string) => {
+    if (title === 'Wallet') {
+      navigation.navigate('Tokens'); // Must match Tab.Screen name
+    }
+
+    // You can extend with more navigation logic:
+    // else if (title === 'Staking') {
+    //   navigation.navigate('StakingScreen');
+    // }
+  };
+
   return (
     <View style={styles.container}>
       {features.map((item, index) => (
-        <TouchableOpacity key={index}>
+        <TouchableOpacity key={index} onPress={() => handlePress(item.title)}>
           <ImageBackground
             source={require('assets/omni_symbol_bg.png')}
             style={styles.box}

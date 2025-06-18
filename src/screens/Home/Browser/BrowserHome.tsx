@@ -11,6 +11,7 @@ import RecommendSection from './Shared/RecommendSection';
 import HistorySection from './Shared/HistorySection';
 import MissionPoolSection from './Shared/MissionPoolSection';
 import FeatureQuickAccess from './FeatureQuickAccess';
+import { EVM_DAPPS } from 'constants/evmDApps';
 
 const ItemSeparator = () => {
   const stylesheet = createStylesheet();
@@ -27,13 +28,20 @@ const BrowserHome = () => {
     !!bannerData && onPressSectionItem(bannerData[index]);
   };
 
-  const bannerData = useMemo(() => {
-    if (!dApps) {
-      return undefined;
-    }
+  // const bannerData = useMemo(() => {
+  //   if (!dApps) {
+  //     return undefined;
+  //   }
 
-    return dApps.filter(dApp => dApp.is_featured);
-  }, [dApps]);
+  //   return dApps.filter(dApp => dApp.is_featured);
+  // }, [dApps]);
+const bannerData = useMemo(() => {
+  const filtered = EVM_DAPPS.filter(dApp => dApp.is_featured);
+  console.log('📢 bannerData:', filtered);
+  return filtered;
+}, []);
+
+
 
   const getBannerImages = useMemo(() => {
     if (!bannerData) {
@@ -53,13 +61,13 @@ const BrowserHome = () => {
   return (
     <View style={stylesheet.container}>
       <ScrollView showsVerticalScrollIndicator={false} showsHorizontalScrollIndicator={false}>
-        {/* <ImageSlider data={getBannerImages} onPressItem={onPressImageSliderItem} /> */}
+        <ImageSlider data={getBannerImages} onPressItem={onPressImageSliderItem} />
        <FeatureQuickAccess /> 
         <HistorySection dApps={dApps} renderItemSeparator={ItemSeparator} />
         <BookmarkSection dApps={dApps} renderItemSeparator={ItemSeparator} />
         <RecommendSection  onPressSectionItem={onPressSectionItem} />
-        <ImageSlider data={getBannerImages} onPressItem={onPressImageSliderItem} />
-        <MissionPoolSection />
+      
+        {/* <MissionPoolSection /> */}
       </ScrollView>
     </View>
   );

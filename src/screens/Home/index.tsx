@@ -4,7 +4,7 @@ import EarningScreen from 'screens/Home/Earning';
 
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Aperture, Globe, Rocket, Vault, Wallet } from 'phosphor-react-native';
+import { Aperture, Brain, Globe, Robot, Rocket, Vault, Wallet } from 'phosphor-react-native';
 import { CryptoScreen } from 'screens/Home/Crypto';
 import { FontMedium } from 'styles/sharedStyles';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,6 +34,7 @@ import { mmkvStore } from 'utils/storage';
 import { GeneralTermModal } from 'components/Modal/GeneralTermModal';
 import { TermAndCondition } from 'constants/termAndCondition';
 import { ALL_ACCOUNT_KEY } from '@subwallet/extension-base/constants';
+import AIScreen from 'screens/AI/AIScreen';
 
 interface tabbarIconColor {
   color: string;
@@ -56,6 +57,10 @@ const browserTabbarIcon = ({ color }: tabbarIconColor) => {
 const getSettingsContent = (props: DrawerContentComponentProps) => {
   return <Settings {...props} />;
 };
+const aiTabbarIcon = ({ color }: tabbarIconColor) => {
+  return <Robot size={24} color={color} weight="fill" />;
+};
+
 const MainScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
   const Tab = createBottomTabNavigator<HomeStackParamList>();
   const insets = useSafeAreaInsets();
@@ -117,7 +122,7 @@ const MainScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
           tabBarIcon: tokenTabbarIcon,
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name={'NFTs'}
         component={NFTStackScreen}
         options={{
@@ -125,8 +130,8 @@ const MainScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
           tabBarHideOnKeyboard: Platform.OS === 'android',
           tabBarIcon: nftTabbarIcon,
         }}
-      />
-      <Tab.Screen
+      /> */}
+      {/* <Tab.Screen
         name={'Earning'}
         component={EarningScreen}
         listeners={{
@@ -139,7 +144,7 @@ const MainScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
           tabBarHideOnKeyboard: Platform.OS === 'android',
           tabBarIcon: stakingTabbarIcon,
         }}
-      />
+      /> */}
       {isShowBuyToken && (
         <Tab.Screen
           name={'Browser'}
@@ -151,6 +156,15 @@ const MainScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
         />
       )}
       <Tab.Screen
+        name="AI"
+        component={AIScreen}
+        options={{
+          tabBarLabel: (i18n.tabName as any).ai,
+          tabBarIcon: aiTabbarIcon,
+        }}
+      />
+
+      {/* <Tab.Screen
         name={'Crowdloans'}
         component={withPageWrapper(CrowdloansScreen, ['crowdloan', 'price', 'chainStore', 'logoMaps'])}
         options={{
@@ -158,7 +172,7 @@ const MainScreen = ({ navigation }: NativeStackScreenProps<{}>) => {
           tabBarHideOnKeyboard: Platform.OS === 'android',
           tabBarIcon: crowdloanTabbarIcon,
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

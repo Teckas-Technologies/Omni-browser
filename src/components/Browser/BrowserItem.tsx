@@ -61,6 +61,8 @@ export const BrowserItem = ({ logo, title, url, style, onPress, tags, isLoading 
       return;
     }
     setImage(assetLogoMap.default);
+    console.log('Fallback image:', assetLogoMap.default);
+
   }, [assetLogoMap.default, image, url]);
 
   return (
@@ -104,6 +106,7 @@ interface DesktopModeProps {
   url: string;
 }
 const DesktopMode: React.FC<DesktopModeProps> = ({ url }) => {
+  console.log('defaultUrl:', url);
   const { desktopMode } = useGetDesktopMode(url);
   const theme = useSubWalletTheme().swThemes;
   if (!desktopMode) {
