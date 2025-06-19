@@ -40,7 +40,7 @@ const ChatScreen = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://192.168.250.242:8000/ask', {
+      const res = await axios.post('/ask', {
         question: message,
       });
 

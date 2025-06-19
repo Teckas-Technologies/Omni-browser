@@ -33,7 +33,7 @@ const ImageGeneratorScreen = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://192.168.250.187:8000/generate-image', {
+      const response = await axios.post('/generate-image', {
         prompt,
         style: selectedStyle,
         aspect_ratio: selectedRatio,
