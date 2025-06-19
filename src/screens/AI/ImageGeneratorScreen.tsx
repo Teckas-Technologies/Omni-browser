@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,29 +7,54 @@ import {
   StyleSheet,
   Dimensions,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from 'routes/index'; // Adjust path if needed
+import { RootStackParamList } from 'routes/index';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'GeneratedImage'>;
 
-const ASPECT_RATIOS = ['1:1', '4:3', '3:4', '16:9', '9:16', '2:3', '3:2', '5:4', '21:9'];
+const ASPECT_RATIOS = ['1:1', '16:9', '9:16'];
 const ART_STYLES = ['Colorful', 'Sketch', 'Cyberpunk'];
 
 const ImageGeneratorScreen = () => {
   const navigation = useNavigation<NavigationProp>();
+  const [prompt, setPrompt] = useState('');
+  const [selectedRatio, setSelectedRatio] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // ✅ loading state
 
-  const handleGenerate = () => {
-    navigation.navigate('GeneratedImage'); // 👈 Adjust this to your screen name
+  const handleGenerate = async () => {
+    if (!prompt) return;
+
+    setIsLoading(true);
+    try {
+      const response = await axios.post('http://192.168.250.187:8000/generate-image', {
+        prompt,
+        style: selectedStyle,
+        aspect_ratio: selectedRatio,
+      });
+
+      const imageUrl = response.data.image_url;
+      console.log();
+      
+      navigation.navigate('GeneratedImage', { imageUrl });
+    } catch (error) {
+      console.error('Error generating image:', error);
+    } finally {
+      setIsLoading(false); // ✅ reset loading
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        Hello, I’m <Text style={styles.highlight}>OMNI</Text>{'\n'}your Image Generator
+        Hello, I’m <Text style={styles.highlight}>OMNI</Text>
+        {'\n'}your Image Generator
       </Text>
 
       <View style={styles.textAreaWrapper}>
@@ -38,6 +63,8 @@ const ImageGeneratorScreen = () => {
           placeholderTextColor="#fff"
           style={styles.textArea}
           multiline
+          value={prompt}
+          onChangeText={setPrompt}
         />
         <TouchableOpacity style={styles.reloadIconWrapper}>
           <Image source={require('assets/reload.png')} style={styles.reloadIcon} />
@@ -48,7 +75,10 @@ const ImageGeneratorScreen = () => {
         <Text style={styles.sectionTitle}>Aspect Ratio</Text>
         <View style={styles.ratioGrid}>
           {ASPECT_RATIOS.map((ratio, index) => (
-            <TouchableOpacity key={index} style={styles.ratioBox}>
+            <TouchableOpacity
+              key={index}
+              style={[styles.ratioBox, selectedRatio === ratio && { backgroundColor: '#444' }]}
+              onPress={() => setSelectedRatio(ratio)}>
               <Text style={styles.ratioText}>{ratio}</Text>
             </TouchableOpacity>
           ))}
@@ -59,7 +89,10 @@ const ImageGeneratorScreen = () => {
         <Text style={styles.sectionTitle}>Art Style</Text>
         <View style={styles.styleRow}>
           {ART_STYLES.map((style, index) => (
-            <TouchableOpacity key={index} style={styles.styleButton}>
+            <TouchableOpacity
+              key={index}
+              style={[styles.styleButton, selectedStyle === style && { backgroundColor: '#444' }]}
+              onPress={() => setSelectedStyle(style)}>
               <Text style={styles.styleText}>{style}</Text>
             </TouchableOpacity>
           ))}
@@ -67,9 +100,18 @@ const ImageGeneratorScreen = () => {
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.generateButton} onPress={handleGenerate}>
-          <Image source={require('assets/glitter.png')} style={styles.glitterIcon} />
-          <Text style={styles.generateText}>Generate</Text>
+        <TouchableOpacity style={styles.generateButton} onPress={handleGenerate} disabled={isLoading}>
+          {isLoading ? (
+            <View style={styles.loadingContent}>
+              <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
+              <Text style={styles.generateText}>Generating image...</Text>
+            </View>
+          ) : (
+            <>
+              <Image source={require('assets/glitter.png')} style={styles.glitterIcon} />
+              <Text style={styles.generateText}>Generate</Text>
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -77,7 +119,6 @@ const ImageGeneratorScreen = () => {
 };
 
 export default ImageGeneratorScreen;
-
 
 const styles = StyleSheet.create({
   container: {
@@ -92,10 +133,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: '400',
     marginTop: 35,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   highlight: {
     color: '#53A8F1',
-    fontWeight: '700',
+    fontWeight: '600',
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   textAreaWrapper: {
     position: 'relative',
@@ -111,6 +154,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     padding: 12,
     paddingBottom: 30,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   reloadIconWrapper: {
     position: 'absolute',
@@ -134,6 +178,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 10,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   ratioGrid: {
     flexDirection: 'row',
@@ -153,6 +198,7 @@ const styles = StyleSheet.create({
   ratioText: {
     color: '#fff',
     fontSize: 12,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   artStyleContainer: {
     marginBottom: 20,
@@ -173,6 +219,7 @@ const styles = StyleSheet.create({
   styleText: {
     color: '#fff',
     fontSize: 13,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   footer: {
     marginTop: 'auto',
@@ -195,5 +242,12 @@ const styles = StyleSheet.create({
   generateText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: 'PlusJakartaSans-Medium',
+  },
+  loadingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
+

@@ -98,7 +98,7 @@ export type RootStackParamList = {
    ImportWallet: undefined;
    ChatScreen: undefined;
     ImageGeneratorScreen: undefined;
-    GeneratedImage:undefined;
+    GeneratedImage: { imageUrl: string };
 CreateUserName: { 
     pathName: string;  // Add this parameter
   };

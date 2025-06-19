@@ -12,6 +12,11 @@ const AIScreen = () => {
 
   return (
     <View style={styles.container}>
+       {/* <Image
+        source={require('assets/mesh-gradient.png')}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      /> */}
       <Text style={styles.welcomeText}>
         Hello, I’m <Text style={styles.highlight}>OMNI</Text>
         {'\n'}your AI Assistance
@@ -63,20 +68,21 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 32,
     color: '#fff',
-    textAlign: 'left', // ✅ ensures text starts from left
-    alignSelf: 'flex-start', // ✅ aligns text container to start
+    textAlign: 'left',
+    alignSelf: 'flex-start',
     marginBottom: 40,
     lineHeight: 32,
     marginTop: 30,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
-
   highlight: {
     color: '#53A8F1',
     fontWeight: '600',
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   cardsContainer: {
     width: '100%',
-    gap: 20, // Not supported in React Native, remove or simulate via marginBottom
+    // React Native doesn't support `gap`, so spacing is handled in card margins
   },
   cardIcon: {
     width: 30,
@@ -85,19 +91,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 4,
   },
-
   arrowImage: {
     width: 30,
     height: 30,
   },
-
   bottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 16,
   },
-
   card: {
     width: '50%',
     height: 190,
@@ -109,28 +112,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-
   alignLeft: {
     alignSelf: 'flex-start',
   },
-
   alignRight: {
     alignSelf: 'flex-end',
-  },
-
-  iconWrapper: {
-    backgroundColor: '#53A8F1',
-    borderRadius: 20,
-    width: 34,
-    height: 34,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   cardText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: '500',
     lineHeight: 20,
+    fontFamily: 'PlusJakartaSans-Medium',
   },
   arrowIcon: {
     alignSelf: 'flex-end',
@@ -141,5 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: '#fff',
     textAlign: 'center',
+    fontFamily: 'PlusJakartaSans-Medium',
   },
 });
+
