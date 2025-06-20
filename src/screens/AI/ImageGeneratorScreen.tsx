@@ -33,7 +33,7 @@ const ImageGeneratorScreen = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('/generate-image', {
+      const response = await axios.post('https://omni-browser-assistant-be-h2a2evfkdagdfngf.canadacentral-01.azurewebsites.net/generate-image', {
         prompt,
         style: selectedStyle,
         aspect_ratio: selectedRatio,
@@ -41,7 +41,7 @@ const ImageGeneratorScreen = () => {
 
       const imageUrl = response.data.image_url;
       console.log();
-      
+
       navigation.navigate('GeneratedImage', { imageUrl });
     } catch (error) {
       console.error('Error generating image:', error);
@@ -66,7 +66,7 @@ const ImageGeneratorScreen = () => {
           value={prompt}
           onChangeText={setPrompt}
         />
-        <TouchableOpacity style={styles.reloadIconWrapper}>
+        <TouchableOpacity style={styles.reloadIconWrapper} onPress={() => setPrompt('')}>
           <Image source={require('assets/reload.png')} style={styles.reloadIcon} />
         </TouchableOpacity>
       </View>
@@ -77,7 +77,7 @@ const ImageGeneratorScreen = () => {
           {ASPECT_RATIOS.map((ratio, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.ratioBox, selectedRatio === ratio && { backgroundColor: '#444' }]}
+              style={[styles.ratioBox, selectedRatio === ratio && styles.selectedBox]}
               onPress={() => setSelectedRatio(ratio)}>
               <Text style={styles.ratioText}>{ratio}</Text>
             </TouchableOpacity>
@@ -91,7 +91,7 @@ const ImageGeneratorScreen = () => {
           {ART_STYLES.map((style, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.styleButton, selectedStyle === style && { backgroundColor: '#444' }]}
+              style={[styles.styleButton, selectedStyle === style && styles.selectedBox]}
               onPress={() => setSelectedStyle(style)}>
               <Text style={styles.styleText}>{style}</Text>
             </TouchableOpacity>
@@ -107,10 +107,10 @@ const ImageGeneratorScreen = () => {
               <Text style={styles.generateText}>Generating image...</Text>
             </View>
           ) : (
-            <>
+            <View style={styles.loadingContent}>
               <Image source={require('assets/glitter.png')} style={styles.glitterIcon} />
               <Text style={styles.generateText}>Generate</Text>
-            </>
+            </View>
           )}
         </TouchableOpacity>
       </View>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   styleButton: {
     backgroundColor: '#333',
-    paddingVertical: 10,
+    paddingVertical: 13,
     paddingHorizontal: 20,
     borderRadius: 20,
     flex: 1,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   styleText: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: 11,
     fontFamily: 'PlusJakartaSans-Medium',
   },
   footer: {
@@ -226,14 +226,16 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   generateButton: {
-    backgroundColor: '#1e1e1e',
-    paddingVertical: 14,
+    backgroundColor: '#69808A59', // semi-transparent blue-gray
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     borderRadius: 25,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    width: '100%',
+    alignSelf: 'center', // centers the button
   },
+
   glitterIcon: {
     width: 18,
     height: 18,
@@ -241,7 +243,7 @@ const styles = StyleSheet.create({
   },
   generateText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'PlusJakartaSans-Medium',
   },
   loadingContent: {
@@ -249,5 +251,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  selectedBox: {
+    backgroundColor: '#69808A59', // light blue selection
+  },
 });
-

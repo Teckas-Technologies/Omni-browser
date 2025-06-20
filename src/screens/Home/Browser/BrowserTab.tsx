@@ -120,6 +120,7 @@ const InjectPageJsScript: InjectPageJsScriptType = {
     return await this.init();
   },
 };
+console.log("injected",DAppScript);
 
 const getJsInjectContent = (showLog?: boolean) => {
   let injectedJS = '';
@@ -146,6 +147,8 @@ const injectScriptHandler: { script: string | null; promise: Promise<void> } = {
 
 injectScriptHandler.promise = (async () => {
   const injectPageJsContent = await InjectPageJsScript.get();
+  console.log("script---",injectPageJsContent);
+  
   injectScriptHandler.script =
     getJsInjectContent() + BridgeScript + injectPageJsContent + ConnectToNovaScript + DAppScript;
 })();
@@ -166,6 +169,8 @@ const Component = ({ tabId, onOpenBrowserTabs, connectionTrigger }: Props, ref: 
   const stylesheet = createStylesheet(theme);
   const navigation = useNavigation<RootNavigationProps>();
   const historyItems = useSelector((state: RootState) => state.browser.history);
+  console.log("historyy",historyItems);
+  
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [initWebViewSource, setInitWebViewSource] = useState<string | null>(null);
   const [progressNumber, setProgressNumber] = useState<number>(0);

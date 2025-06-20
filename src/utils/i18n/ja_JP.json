@@ -429,7 +429,7 @@
     "generalTermCheckbox": "私は、SubWallet とそのすべての機能の使用を規定する本契約の条件を理解し、これに同意します",
     "scrollInstruction": "スクロールしてすべてのセクションを読みます",
     "iUnderStand": "なるほど",
-    "masterPasswordCheckbox": "SubWallet ではこのパスワードを回復できないことを理解しています。",
+    "masterPasswordCheckbox": "OmniBrowser ではこのパスワードを回復できないことを理解しています。",
     "learnMore": "もっと詳しく知る",
     "withdraw": "Withdraw",
     "cancelUnstake": "Cancel unstake",

@@ -429,7 +429,7 @@
     "generalTermCheckbox": "I understand and agree to the Terms of Use, which apply to my use of SubWallet and all of its feature",
     "scrollInstruction": "Scroll to read all sections",
     "iUnderStand": "I understand",
-    "masterPasswordCheckbox": "I understand that SubWallet can't recover this password for me. ",
+    "masterPasswordCheckbox": "I understand that Omni Browser can't recover this password for me. ",
     "learnMore": "Learn more.",
     "withdraw": "Withdraw",
     "cancelUnstake": "Cancel unstake",

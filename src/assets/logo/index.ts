@@ -12,7 +12,7 @@ const RussianLogo = React.lazy(() => import('./russia.svg'));
 export const ImageLogosMap = {
   parity: require('./207.vault.png'),
   keystone: require('./202.keystone.png'),
-  subwallet: require('./00.subwallet.png'),
+  subwallet: require('./00.subwallet1.png'),
   __qr_code__: require('./203.__qr_code__.png'),
   transak: require('./transak.png'),
   moonpay: require('./moonpay.png'),

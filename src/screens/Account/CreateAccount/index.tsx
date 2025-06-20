@@ -116,7 +116,7 @@ export const CreateAccount = ({ route: { params } }: CreateAccountProps) => {
           onBackButtonPress={() => navigation.goBack()}
           onPressSubmit={onPressSubmitTnCSeedPhraseModal}
           setVisible={setShowSeedPhraseInstruction}
-          isVisible={showSeedPhraseInstruction}
+          isVisible={false}
         />
       )}
     </>

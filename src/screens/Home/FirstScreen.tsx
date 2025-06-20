@@ -29,12 +29,16 @@ export const FirstScreen = () => {
       <Image source={require('assets/images/omni_logo.png')} style={styles.topLogo} resizeMode="contain" />
 
       {/* Center Symbol */}
-      <ImageBackground
-        source={require('assets/images/omni_symbol_bg.png')}
-        style={styles.centerSymbolBg}
-        resizeMode="contain">
-        <Image source={require('assets/images/omni_symbol.png')} style={styles.centerSymbol} resizeMode="contain" />
-      </ImageBackground>
+     <View style={styles.centerSymbolWrapper}>
+  <Image source={require('assets/gradient.png')} style={styles.meshGradient} resizeMode="cover" />
+  <ImageBackground
+    source={require('assets/images/omni_symbol_bg.png')}
+    style={styles.centerSymbolBg}
+    resizeMode="contain">
+    <Image source={require('assets/images/omni_symbol.png')} style={styles.centerSymbol} resizeMode="contain" />
+  </ImageBackground>
+</View>
+
 
       {/* Centered Welcome Text + Button Block */}
       <View style={styles.centeredTextWrapper}>
@@ -75,6 +79,24 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     alignSelf: 'flex-start',
   },
+centerSymbolWrapper: {
+  width: 260,
+  height: 260,
+  marginBottom: 40,
+  justifyContent: 'center',
+  alignItems: 'center',
+  position: 'relative',
+},
+
+meshGradient: {
+  position: 'absolute',
+  width: 450,
+  height: 260,
+  borderRadius: 130,
+  zIndex: -1, // keep it behind other content
+},
+
+
   centerSymbolBg: {
     width: 240,
     height: 240,
@@ -110,7 +132,7 @@ const styles = StyleSheet.create({
   },
   buttonAlignRight: {
     width: '85%', // approx width matching title text line
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   primaryButton: {
     backgroundColor: '#1C1C1E',

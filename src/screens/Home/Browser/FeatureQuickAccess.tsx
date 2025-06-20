@@ -8,6 +8,8 @@ import {
   ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from 'routes/index'; // Make sure this is the correct path
 
 const features = [
   { title: 'Wallet', icon: require('assets/omni_wallet_icon.png') },
@@ -17,17 +19,17 @@ const features = [
 ];
 
 const FeatureQuickAccess = () => {
-  const navigation = useNavigation();
+  type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+  const navigation = useNavigation<NavigationProp>();
 
   const handlePress = (title: string) => {
     if (title === 'Wallet') {
-      navigation.navigate('Tokens'); // Must match Tab.Screen name
+      navigation.navigate('Tokens');
+    } else if (title === 'Omni Bot') {
+      navigation.navigate('ChatScreen');
+    } else if (title === 'AI Image') {
+      navigation.navigate('ImageGeneratorScreen');
     }
-
-    // You can extend with more navigation logic:
-    // else if (title === 'Staking') {
-    //   navigation.navigate('StakingScreen');
-    // }
   };
 
   return (

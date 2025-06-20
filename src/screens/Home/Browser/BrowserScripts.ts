@@ -89,9 +89,32 @@ predefinedDApps.dapps.forEach(s => {
 });
 
 export const DAppScript = `(function () {
-  if (window.SubWallet) {
-    window.SubWallet.isMetaMask = true;
-  }
+  // Inject OmniWallet provider
+  window.injectedWeb3 = window.injectedWeb3 || {};
+
+  window.injectedWeb3['omniwallet-js'] = {
+    version: '1.0.0',
+    name: 'OmniWallet',
+    enable: () => {
+      return Promise.resolve({
+        name: 'OmniWallet',
+        version: '1.0.0',
+        accounts: [], // Replace with real account list later
+        signer: {
+          signPayload: () => Promise.reject('signing not implemented'),
+          signRaw: () => Promise.reject('signRaw not implemented'),
+        },
+      });
+    },
+    subscribe: () => {},
+  };
+
+  window.injectedWeb3['polkadot-js'] = window.injectedWeb3['omniwallet-js'];
+
+  window.OmniWallet = {
+    isMetaMask: true,
+    enable: () => window.injectedWeb3['omniwallet-js'].enable(),
+  };
 
   if (window.ethereum) {
     window.ethereum.isMetaMask = true;
@@ -104,7 +127,7 @@ export const DAppScript = `(function () {
       'walletConnected',
       JSON.stringify({
         isMetaMask: false,
-        isSubWallet: true,
+        isOmniWallet: true,
       }),
     );
 
@@ -114,11 +137,7 @@ export const DAppScript = `(function () {
         message: 'evm(request)',
         origin: '${MESSAGE_ORIGIN_PAGE}',
         request: {
-          params: [
-            {
-              chainId: '0x505',
-            },
-          ],
+          params: [{ chainId: '0x505' }],
           method: 'wallet_switchEthereumChain',
         },
       },
@@ -129,24 +148,25 @@ export const DAppScript = `(function () {
       'walletConnected',
       JSON.stringify({
         isMetaMask: false,
-        isSubWallet: true,
+        isOmniWallet: true,
       }),
     );
   } else if (hostName === 'app.beamswap.io') {
-    const originSimpleUser = JSON.parse(localStorage.getItem('redux_localstorage_simple_user'));
-    if (originSimpleUser.connector !== 'SUBWALLET') {
-      originSimpleUser.connector = 'SUBWALLET';
+    const originSimpleUser = JSON.parse(localStorage.getItem('redux_localstorage_simple_user') || '{}');
+    if (originSimpleUser.connector !== 'OMNIWALLET') {
+      originSimpleUser.connector = 'OMNIWALLET';
       localStorage.setItem('redux_localstorage_simple_user', JSON.stringify(originSimpleUser));
     }
   }
 
-  window.injectedWeb3['polkadot-js'] = window.injectedWeb3['subwallet-js'];
+  const autoTriggerEthereumHosts = ${JSON.stringify(autoTriggerEthereumHosts)};
+  const autoTriggerSubstrateHosts = ${JSON.stringify(autoTriggerSubstrateHosts)};
 
-  if (${JSON.stringify(autoTriggerEthereumHosts)}.includes(hostName)) {
-    window.SubWallet?.enable().catch(e => console.log(e));
+  if (autoTriggerEthereumHosts.includes(hostName)) {
+    window.OmniWallet?.enable().catch(e => console.log(e));
   }
 
-  if (${JSON.stringify(autoTriggerSubstrateHosts)}.includes(hostName)) {
-    window.injectedWeb3['subwallet-js']?.enable().catch(e => console.log(e));
+  if (autoTriggerSubstrateHosts.includes(hostName)) {
+    window.injectedWeb3['omniwallet-js']?.enable().catch(e => console.log(e));
   }
 })()`;

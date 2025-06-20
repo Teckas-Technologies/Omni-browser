@@ -33,7 +33,7 @@
           <action android:name="android.intent.action.VIEW" />
           <category android:name="android.intent.category.DEFAULT" />
           <category android:name="android.intent.category.BROWSABLE" />
-          <data android:scheme="subwallet" />
+          <data android:scheme="omniwallet" />
         </intent-filter>
         <intent-filter>
           <data android:scheme="wc" />
@@ -46,7 +46,7 @@
           <category android:name="android.intent.category.DEFAULT" />
           <category android:name="android.intent.category.BROWSABLE" />
           <data android:scheme="https" />
-          <data android:host="mobile.subwallet.app" />
+          <data android:host="mobile.omniwallet.app" />
         </intent-filter>
       </activity>
     </application>

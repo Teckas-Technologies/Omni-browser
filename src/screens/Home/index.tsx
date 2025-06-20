@@ -280,7 +280,7 @@ export const Home = ({ navigation }: Props) => {
       {!isLocked && <RequestCreateMasterPasswordModal visible={!hasMasterPassword && !isEmptyAccounts} />}
       {!isLocked && !isOpenGeneralTermFirstTime && !needMigrate && (
         <GeneralTermModal
-          modalVisible={generalTermVisible}
+          modalVisible={false}
           setVisible={setGeneralTermVisible}
           onPressAcceptBtn={onPressAcceptBtn}
           disabledOnPressBackDrop={true}

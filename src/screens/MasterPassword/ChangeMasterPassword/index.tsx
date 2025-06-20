@@ -281,7 +281,7 @@ const ChangeMasterPassword = () => {
             label={
               <Typography.Text style={{ color: theme.colorWhite, marginLeft: theme.marginXS, flex: 1 }}>
                 {i18n.buttonTitles.masterPasswordCheckbox}
-                <Text
+                {/* <Text
                   style={{
                     textDecorationStyle: 'solid',
                     textDecorationLine: 'underline',
@@ -294,7 +294,7 @@ const ChangeMasterPassword = () => {
                     )
                   }>
                   {i18n.buttonTitles.learnMore}
-                </Text>
+                </Text> */}
               </Typography.Text>
             }
             onPress={() => setChecked(!checked)}
